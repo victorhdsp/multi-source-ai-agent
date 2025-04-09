@@ -15,8 +15,8 @@ Welcome to the Multi-Source AI Agent Challenge! In this project, you'll build an
 Your AI agent must be able to:
 
 1. **Answer questions using multiple data sources:**
-   - **SQLite databases**: The agent should query `.db` files placed in the `sqlite` folder
-   - **Document context**: The agent should extract information from `.txt` files in the `documents` folder
+   - **SQLite databases**: The agent should query `.db` files placed in the `data/sqlite` folder
+   - **Document context**: The agent should extract information from `.txt` files in the `data/documents` folder
    - **External data**: The agent should be able to run bash commands (with user approval) to gather additional data (e.g., using `curl` to fetch web content)
 
 2. **Implement a conversational interface** - either in the browser or terminal
