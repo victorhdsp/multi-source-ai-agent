@@ -1,5 +1,7 @@
 # Planejamento
 
+https://lokito.notion.site/Multi-target-agent-24ed915b7f5180fe8c58e9a6c29b4fac?pvs=73
+
 Meu objetivo é criar um agente capaz de interagir com o usuário para executar tarefas e responder dúvidas.
 
 1. Executar comandos de bash com permissão do usuário;
@@ -14,6 +16,11 @@ Tenho um plano divido em 3 blocos principais:
 1. **Bloco de perguntas**: Recebo a pergunta do usuário e faço a decisão de qual o próximo passo;
 2. **Bloco de pesquisa**: Onde busco as informações necessárias para responder a pergunta do usuário;
 3. **Bloco de respostas**: Onde decido como responder a pergunta do usuário;
+
+**Padronização**
+Algumas informações são relevantes para multiplos prompts de LLM, por exemplo o que o `type: "task"` significa, ou o que é o `type: "aswer"`, o que é a string "DOCUMENTS" em `sources`, etc. Essas informações são padronizadas e guardadas em um arquivo separado, que é importado para os prompts de LLM.
+
+Outra informação padronizada são as mensagens de erro, que são guardadas em um arquivo separado, que é importado para os prompts de LLM.
 
 ### Fluxograma
 
@@ -75,11 +82,11 @@ flowchart TD
     - Sei se é uma pergunta ou uma tarefa, através da resposta da LLM;
 2. Identificar onde conseguir as informações faltantes com base em uma ordem de prioridade:
     - Algumas ferramentas podem precisar de permissão do usuário para serem executadas.
-    1. Banco de dados SQL;
+    1. Banco de dados SQL [Coleta sem permissão]:
         - A informação bate com o metadado guardado daquela tabela do banco de dados;
-    2. Perguntar ao usuário diretamente;
+    2. Perguntar ao usuário diretamente; 
         - A informação depende da opinião do usuário como nomes, senhas, configurações pessoais, etc;
-    3. Internet (através do `curl`);
+    3. Internet (através do `curl`) [Coleta com permissão]:
         - Permissão do usuário para acessar a internet e buscar informações.
 
 3. Tenho informações o suficiente para responder a pergunta?
