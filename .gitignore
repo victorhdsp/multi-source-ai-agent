@@ -136,4 +136,4 @@ dist
 .pnp.*
 
 
-database/vector/*
+**/*/database/vector/*
