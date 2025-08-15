@@ -3,6 +3,7 @@ import type { IVectorStore, VectorDocument, VectorSearchResult } from "../interf
 import type { Embeddings } from "@langchain/core/embeddings";
 import { promises as fs } from "fs";
 import type { SpaceName } from "hnswlib-node";
+import { logger } from "@/src/tools/logger";
 
 export class VectorStore implements IVectorStore {
     private vectorStore: HNSWLib | null = null;
@@ -54,7 +55,7 @@ export class VectorStore implements IVectorStore {
             await fs.access(`${path}/${this.FILENAME}`);
 
         } catch (error) {
-            console.log(`Saving vector store to ${path}`);
+            logger.info(`Saving vector store to ${path}`);
             this.vectorStore = new HNSWLib(this.embeddings, {
                 space: this.SPACE,
                 numDimensions: this.NUM_DIMENSIONS
@@ -73,7 +74,7 @@ export class VectorStore implements IVectorStore {
             );
             return true;
         } catch (error) {
-            console.log(`Failed to access vector store at ${path}:`, error);
+            logger.error(`Failed to access vector store at ${path}:`, error);
             return false;
         }
     }

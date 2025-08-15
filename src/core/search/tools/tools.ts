@@ -7,6 +7,7 @@ import { docPageTool } from "./getPage/doc";
 import { docFindDBMusicTool } from "./musicDB/doc";
 import type { GetPageTool } from "./getPage/tool";
 import type { FindMusicDBTool } from "./musicDB/tool";
+import { logger } from "@/src/tools/logger";
 
 export class SearchAgentTools {
     searchAgentTools: resolveToolType[] = [];
@@ -70,13 +71,12 @@ export class SearchAgentTools {
         
         let newItemToHistory = "";
         const rawStateContent = JSON.parse(state.llMOutput.content)
-        console.log("Raw state content for getPage:", rawStateContent); 
         const params = docPageTool.schema.parse(rawStateContent);
 
         try {
             newItemToHistory = await this.getPageTool.invoke({ url: params.url });
         } catch (error) {
-            console.error("Error occurred while fetching page:", error);
+            logger.error("Error occurred while fetching page:", error);
             newItemToHistory = `Não consegui acessar a página ${params.url}`;
         }
 

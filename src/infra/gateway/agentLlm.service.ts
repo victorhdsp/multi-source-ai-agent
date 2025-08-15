@@ -1,4 +1,5 @@
 import { ERROR_TYPE } from "@/src/config";
+import { logger } from "@/src/tools/logger";
 import type { CallbackManagerForLLMRun } from "@langchain/core/callbacks/manager";
 import { BaseChatModel } from "@langchain/core/language_models/chat_models";
 import type { BaseMessage } from "@langchain/core/messages";
@@ -42,7 +43,7 @@ export class AgentLLMService extends BaseChatModel {
 
         } catch (err) {
             if (tryCount < 2) {
-                console.warn(`Tentativa ${tryCount + 1} falhou. Tentando novamente...`);
+                logger.warn(`Tentativa ${tryCount + 1} falhou. Tentando novamente...`);
                 return this._generate(messages, options, runManager, tryCount + 1);
             }
             const error = err as Error;

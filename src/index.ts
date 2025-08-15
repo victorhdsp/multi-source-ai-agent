@@ -1,31 +1,49 @@
+import readline from "readline";
 import { callToMultiAgentUseCase, dependencies } from "./dependences";
+import { logger } from "./tools/logger";
 
 async function main() {
-    console.log("Agent Service is running...");
+    logger.info("Agent Service is running...");
+    
+    const rl = readline.createInterface({
+        input: process.stdin,
+        output: process.stdout,
+        prompt: "Pergunta> "
+    });
 
-    const response = await callToMultiAgentUseCase.execute("Quando Charles Darwin morreu?");
-    console.log("Response from Agent Service:", response);
+    rl.prompt();
+
+    rl.on("line", async (line) => {
+        const question = line.trim();
+        if (!question) {
+            rl.prompt();
+            return;
+        }
+
+        if (question.toLowerCase() === "exit" || question.toLowerCase() === "sair") {
+            logger.info("Encerrando...");
+            rl.close();
+            return;
+        }
+
+        try {
+            const response = await callToMultiAgentUseCase.execute(question);
+            logger.info("Resposta:", response);
+        } catch (err) {
+            logger.error("Erro:", err);
+        }
+
+        rl.prompt();
+    }).on("close", () => {
+        process.exit(0);
+    });
 }
 
-dependencies.init().then(() => {
-    console.log("Dependencies initialized successfully.");
-    main();
-}).catch((error) => {
-    console.error("Error initializing dependencies:", error);
-});
-
-// ```json - RESPOSTA COM INFORMAÇÃO NO RAG
-// {
-//   type: "answer",
-//   content: "John Stuart Mill's \"Principles of Political Economy\" (1848) synthesized classical economic thought, incorporating social philosophy and addressing wealth distribution and the role of government. Key concepts include utilitarianism in economics, diminishing returns, and stationary state economy. It bridged classical economics with neoclassical approaches and introduced social considerations into economic theory.",
-//   missing: [],
-// }
-// ```
-
-// ```json - RESPOSTA SEM INFORMAÇÃO NO RAG
-// {
-//   type: "answer",
-//   content: "Eu não sei. Os trechos fornecidos não contêm informações sobre a morte de Charles Darwin.",
-//   missing: [ "data da morte de Charles Darwin" ],
-// }
-// ```
+dependencies.init()
+    .then(() => {
+        logger.info("Dependencies initialized successfully.");
+        main();
+    })
+    .catch((error) => {
+        logger.error("Error initializing dependencies:", error);
+    });

@@ -7,6 +7,7 @@ import type { SearchAgentDTO, SelfAskDTO } from "./types/dto";
 import { selfAskState } from "./types";
 import { ERROR_MESSAGE } from "@/src/config";
 import type { resolveToolType } from "../tools/type";
+import { logger } from "@/src/tools/logger";
 
 export class SelfAskWithSearchStrategy {
     public readonly boundCallNode;
@@ -21,7 +22,7 @@ export class SelfAskWithSearchStrategy {
             this.model.bindTools(searchAgentTools);
             this.bindedTools = true;
         } else {
-            console.error("Este modelo não suporta vinculação de ferramentas");
+            logger.error("Este modelo não suporta vinculação de ferramentas");
         }
         this.boundCallNode = this.callNode.bind(this);
         this.boundRoute = this.route.bind(this);

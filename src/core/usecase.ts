@@ -6,6 +6,7 @@ import type { ResearchInterferenceUsecase } from "./interference/research.usecas
 import { multiAgentState } from "./types/state";
 import { MULTI_AGENT_STEPS } from "./types/steps";
 import type { CheckResultInterferenceUsecase } from "./interference/checkResult.usecase";
+import { logger } from "../tools/logger";
 
 type MultiAgentState = typeof multiAgentState;
 
@@ -19,6 +20,7 @@ export class MultiAgentUseCase {
     ) {}
 
     private executeGraph (prompt: string) {
+        logger.thinking("Pensando...")
         const workflow = new StateGraph<MultiAgentState>(multiAgentState)
             .addNode("questionNode", this.questionUsecase.boundCallNode, {
                 retryPolicy: this.questionUsecase.boundErrorPolicy,

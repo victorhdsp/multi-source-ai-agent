@@ -7,6 +7,7 @@ import type { QuestionAgentDTO } from "./questionAgent.dto";
 import { MULTI_AGENT_SOURCE_VARS } from "../types/source";
 import { MULTI_AGENT_STEPS } from "../types/steps";
 import type { MultiAgentDTO } from "../types/dto";
+import { logger } from "@/src/tools/logger";
 
 export class QuestionAgentUsecase implements IGenericAgentUsecase {
     public readonly boundCallNode;
@@ -35,7 +36,7 @@ export class QuestionAgentUsecase implements IGenericAgentUsecase {
     async callNode(state: MultiAgentDTO): Promise<MultiAgentDTO> {
         try {
             const output = await this.execute(state.input);
-
+            logger.thinking(output.content);
             return {
                 ...state,
                 llMOutput: output,
@@ -51,19 +52,23 @@ export class QuestionAgentUsecase implements IGenericAgentUsecase {
         retryOn: (error: Error) => {
             if (error.cause == ERROR_TYPE.PARSER)
                 return true;
+
             return false;
         }
     }
 
     async route(state: MultiAgentDTO): Promise<string> {
         if (state.error) {
+            logger.thinking(state.error);
             return MULTI_AGENT_STEPS.ERROR;
         }
 
         if (state.llMOutput.missing.length > 0) {
+            logger.thinking("Faltando informação, buscando...");
             return MULTI_AGENT_STEPS.SEARCH;
         }
 
+        logger.thinking("Pergunta respondida, executando...");
         return MULTI_AGENT_STEPS.EXECUTE;
     }
 }

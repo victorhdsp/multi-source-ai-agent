@@ -6,6 +6,7 @@ import { AgentLLMService } from "../infra/gateway/agentLlm.service";
 import { ChatPromptTemplate } from "@langchain/core/prompts";
 import { toJsonSchema } from "@langchain/core/utils/json_schema";
 import { databaseMetadataSchema } from "../core/search/tools/musicDB/databaseMetadata";
+import { logger } from "./logger";
 
 function generateMetadata(dbPath: string, sampleSize = 5) {
     if (!fs.existsSync(dbPath)) {
@@ -36,14 +37,13 @@ function generateMetadata(dbPath: string, sampleSize = 5) {
             const sampleValues = sampleRows.map((row) => row[col.name]);
             columnMeta[col.name] = {
                 sample_values: sampleValues,
-                description: "" //Gepeto
+                description: ""
             };
         }
 
-        /// Conjunto das descrições das colunas + nome da tabela
         metadata.tables[tableName] = {
             columns: columnMeta,
-            table_description: "" //Gepeto
+            table_description: ""
         };
     }
 
@@ -51,7 +51,7 @@ function generateMetadata(dbPath: string, sampleSize = 5) {
 }
 
 async function main() {
-    console.log("O barato é louco e o processo é lento, aguenta aí...");
+    logger.debug("O barato é louco e o processo é lento, aguenta aí...");
     const llm = new AgentLLMService();
     const prompt = ChatPromptTemplate.fromMessages([
         { role: "system", content: "Você é um agente responsável por criar descrições para elementos de bancos de dados com base no seu conteúdo, você tem acesso a estrutura do banco de dados e nela contem as 5 primeiras linhas de cada coluna, bem como o nome do banco de dado, suas tabelas e colunas, tente fazer a melhor descrição possível para evitar trabalho do revisor.\n" +
@@ -66,18 +66,18 @@ async function main() {
     const files = fs.readdirSync(SQL_DATABASE_PATH);
     for (const file of files) {
         if (path.extname(file) === ".db") {
-            console.log(`Processing ${file}...`);
+            logger.info(`Processing ${file}...`);
             const rawJson = generateMetadata(path.join(SQL_DATABASE_PATH, file), 5);
             const json = JSON.stringify(rawJson);
             const rawResult = await chain.invoke({ database: json, format_instructions: JSON.stringify(format) });
             const resultString = rawResult.text.replace("```json", "").replace("```", "")
-            console.log(resultString);
+            logger.info(resultString);
             const rawParsedResult = JSON.parse(resultString);
             const parsed = databaseMetadataSchema.parse(rawParsedResult);
             const filename = path.basename(file, path.extname(file));
             const outputPath = path.join(SQL_DATABASE_PATH, `${filename}_metadata.json`);
             fs.writeFileSync(outputPath, JSON.stringify(parsed, null, 2), "utf-8");
-            console.log(`Metadata for ${file} written to ${outputPath}`);
+            logger.info(`Metadata for ${file} written to ${outputPath}`);
         }
     };
 }

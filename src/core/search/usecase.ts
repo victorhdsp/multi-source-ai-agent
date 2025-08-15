@@ -65,7 +65,6 @@ export class SearchAgentUsecase implements IGenericAgentUsecase{
             await agent.invoke(new Command({ resume: "y" }), { configurable })
         }
         
-        console.log("Final result:", result);
         return {
             input: result.userInput,
             llMOutput: {

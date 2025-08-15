@@ -10,6 +10,7 @@ import { TextLoader } from "langchain/document_loaders/fs/text";
 import { PDFLoader } from '@langchain/community/document_loaders/fs/pdf';
 import { VECTOR_DATABASE_PATH } from '../config';
 import { RecursiveCharacterTextSplitter } from 'langchain/text_splitter';
+import { logger } from './logger';
 
 env.config();
 
@@ -56,7 +57,7 @@ async function processFile(filePath: string): Promise<VectorDocument[]> {
       }
     }));
   } catch (error) {
-    console.error(`Error processing ${filePath}:`, error);
+    logger.error(`Error processing ${filePath}:`, error);
     return [];
   }
 }
@@ -75,10 +76,10 @@ try {
         const filePath = path.join(DOCUMENT_PATH, file);
         const docs = await processFile(filePath);
         await vectorStore.addDocuments(docs);
-        console.log(`Successfully added ${docs.length} documents from ${file}`);
+        logger.info(`Successfully added ${docs.length} documents from ${file}`);
     }
 
     await vectorStore.save(VECTOR_DATABASE_PATH);
 } catch (error) {
-  console.error("Error initializing vector store:", error)
+  logger.error("Error initializing vector store:", error)
 }
