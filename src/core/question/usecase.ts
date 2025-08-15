@@ -4,14 +4,9 @@ import type { RetryPolicy } from "@langchain/langgraph";
 import { ERROR_TYPE } from "@/src/config";
 import type { IGenericAgentUsecase } from "../interfaces/GenericAgent.usecase";
 import type { QuestionAgentDTO } from "../models/llmAgentResponse.dto";
-import type { MultiAgentDTO } from "../types";
 import { MULTI_AGENT_SOURCE_VARS } from "../types/source";
 import { MULTI_AGENT_STEPS } from "../types/steps";
-
-interface QuestionAgentResponse {
-    output: QuestionAgentDTO;
-    prompt: string;
-}
+import type { MultiAgentDTO } from "../types/dto";
 
 export class QuestionAgentUsecase implements IGenericAgentUsecase {
     constructor(
@@ -19,34 +14,27 @@ export class QuestionAgentUsecase implements IGenericAgentUsecase {
         private readonly questionAgentStrategy: QuestionAgentStrategy
     ) {}
 
-    private async execute(input: string): Promise<QuestionAgentResponse> {
+    private async execute(input: string): Promise<QuestionAgentDTO> {
         const similarData = await this.vectorStore.similaritySearch(input, 5);
         const context = similarData.map(data => data.pageContent).join('\n');
         const prompt = await this.questionAgentStrategy.formatQuestionPrompt(input, context);
         const rawResponse = await this.questionAgentStrategy.sendToModel(prompt);
         const output = await this.questionAgentStrategy.parseOutput(rawResponse);
         
-        return {
-            output,
-            prompt: prompt.promptMessages.map(m => m.toString()).join("\n"),
-        };
+        return output;
     }
 
     async callNode(state: MultiAgentDTO): Promise<MultiAgentDTO> {
         try {
-            const { output, prompt } = await this.execute(state.input);
-
+            const output = await this.execute(state.input);
+            
             return {
                 ...state,
-                input: prompt,
                 llMOutput: output,
                 searchedSources: [MULTI_AGENT_SOURCE_VARS.DOCUMENT]
             };
         } catch (error: any) {
-            return {
-                ...state,
-                error: error.message,
-            };
+            throw Error(error.message || "An error occurred while processing the question.");
         }
     }
 
