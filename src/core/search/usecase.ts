@@ -1,4 +1,4 @@
-import { END, START, StateGraph, type RetryPolicy } from "@langchain/langgraph";
+import { Command, END, MemorySaver, START, StateGraph, type RetryPolicy } from "@langchain/langgraph";
 import type { IGenericAgentUsecase } from "../interfaces/GenericAgent.usecase";
 import type { SearchAgentTools } from "./tools/tools";
 import { MULTI_AGENT_STEPS } from "../types/steps";
@@ -9,28 +9,39 @@ import { SEARCH_AGENT_STEPS } from "./selfAskWithSearch/types/steps";
 import type { SearchAgentDTO } from "./selfAskWithSearch/types/dto";
 
 export class SearchAgentUsecase implements IGenericAgentUsecase{
+    public readonly boundCallNode;
+    public readonly boundRoute;
+    public readonly boundErrorPolicy;
+
     constructor(
         private readonly strategyService: SelfAskWithSearchStrategy,
         private readonly toolService: SearchAgentTools,
-    ){}
+    ){
+        this.boundCallNode = this.callNode.bind(this);
+        this.boundRoute = this.route.bind(this);
+        this.boundErrorPolicy = this.errorPolicy;
+    }
 
     async callNode(state: MultiAgentDTO): Promise<MultiAgentDTO> {
         const workflow = new StateGraph<SearchAgentState>(searchAgentState)
-        .addNode("agentNode", this.strategyService.callNode)
+        .addNode("agentNode", this.strategyService.boundCallNode)
         .addNode("decisionNode", s => s)
-        .addNode("getPageNode", this.toolService.getPage)
-        .addNode("getMusicDbNode", this.toolService.getMusicDB);
-        
+        .addNode("getPageNode", this.toolService.boundGetPage)
+        .addNode("getMusicDbNode", this.toolService.boundFindDBMusic);
+
         workflow.addEdge(START, "agentNode");
         workflow.addEdge("agentNode", "decisionNode");
-        workflow.addConditionalEdges("decisionNode", this.strategyService.route as any, {
+        workflow.addConditionalEdges("decisionNode", this.strategyService.boundRoute as any, {
             [SEARCH_AGENT_STEPS.STOP]: END,
             [SEARCH_AGENT_STEPS.ANALYZE]: "agentNode",
             [SEARCH_AGENT_STEPS.GET_PAGE]: "getPageNode",
             [SEARCH_AGENT_STEPS.GET_MUSIC_DB]: "getMusicDbNode",
         });
+        workflow.addEdge("getPageNode", "decisionNode");
+        workflow.addEdge("getMusicDbNode", "decisionNode");
         
-        const agent = workflow.compile();
+        const checkpointer = new MemorySaver();
+        const agent = workflow.compile({ checkpointer });
         
         const initialState: SearchAgentDTO = {
             userInput: state.input,
@@ -44,8 +55,17 @@ export class SearchAgentUsecase implements IGenericAgentUsecase{
             numberOfSteps: 0,
         }
         
-        const result = await agent.invoke({ ...initialState });
+        const configurable = { thread_id: "search" };
+        const result = await agent.invoke({
+            ...initialState,
+        }, { configurable });
+
+        if ((result as any).__interrupt__) {
+            
+            await agent.invoke(new Command({ resume: "y" }), { configurable })
+        }
         
+        console.log("Final result:", result);
         return {
             input: result.userInput,
             llMOutput: {

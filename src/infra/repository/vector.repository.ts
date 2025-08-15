@@ -55,7 +55,6 @@ export class VectorStore implements IVectorStore {
 
         } catch (error) {
             console.log(`Saving vector store to ${path}`);
-            
             this.vectorStore = new HNSWLib(this.embeddings, {
                 space: this.SPACE,
                 numDimensions: this.NUM_DIMENSIONS

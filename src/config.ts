@@ -25,6 +25,6 @@ export const HUMAN_REQUEST = {
 }
 
 export const HUMAN_RESPONSE = {
-    TRUE: new Set(["sim", "s", "yes"]),
+    TRUE: new Set(["sim", "s", "yes", "y"]),
     FALSE: new Set(["não", "n", "no"]),
 }

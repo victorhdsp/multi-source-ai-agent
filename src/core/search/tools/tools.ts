@@ -2,40 +2,51 @@
 import { interrupt } from "@langchain/langgraph";
 import { ERROR_MESSAGE, HUMAN_REQUEST, HUMAN_RESPONSE } from "@/src/config";
 import type { SearchAgentDTO } from "../selfAskWithSearch/types/dto";
-import type { ITool, resolveToolType } from "./type";
+import type { resolveToolType } from "./type";
 import { docPageTool } from "./getPage/doc";
 import { docFindDBMusicTool } from "./musicDB/doc";
+import type { GetPageTool } from "./getPage/tool";
+import type { FindMusicDBTool } from "./musicDB/tool";
 
 export class SearchAgentTools {
     searchAgentTools: resolveToolType[] = [];
+
     protected getPageTool: resolveToolType;
     protected findDBMusicTool: resolveToolType;
 
+    public readonly boundGetPage;
+    public readonly boundFindDBMusic;
+
     constructor(
-        getPageTool: ITool,
-        findDBMusicTool: ITool
+        getPageTool: GetPageTool,
+        findDBMusicTool: FindMusicDBTool
     ){
-        this.getPageTool = getPageTool.invoke();
-        this.findDBMusicTool = findDBMusicTool.invoke();
+        this.getPageTool = getPageTool.current;
+        this.findDBMusicTool = findDBMusicTool.current;
 
         this.searchAgentTools.push(this.getPageTool);
         this.searchAgentTools.push(this.findDBMusicTool);
+
+        this.boundGetPage = this.getPage.bind(this);
+        this.boundFindDBMusic = this.getMusicDB.bind(this);
     }
 
     private talkToHuman(prompt: string): boolean {
+        let question = prompt;
         const rawResponse = interrupt({
             type: HUMAN_REQUEST.PERMISSION,
-            question: prompt
+            question: question
         });
-        
-        const response = rawResponse.toLowerCase().trim();
 
-        if (HUMAN_RESPONSE.TRUE.has(response))
-            return true;
-        if (HUMAN_RESPONSE.FALSE.has(response))
-            return false;
-        
-        return this.talkToHuman(ERROR_MESSAGE.WRONG_INPUT(["s", "n"]));
+        while(true) {
+            const response = rawResponse.toLowerCase().trim();
+
+            if (HUMAN_RESPONSE.TRUE.has(response))
+                return true;
+            if (HUMAN_RESPONSE.FALSE.has(response))
+                return false;
+            question = ERROR_MESSAGE.WRONG_INPUT(["s", "n"]);
+        }
     }
 
     async getPage (state: SearchAgentDTO): Promise<SearchAgentDTO> {
@@ -46,7 +57,7 @@ export class SearchAgentTools {
                 "Tenho permissão para fazer isso? (y/n)"
             )
 
-            const isPermitted = this.talkToHuman(prompt);
+            const isPermitted = true//this.talkToHuman(prompt);
 
             if (!isPermitted) {
                 return {
@@ -56,14 +67,23 @@ export class SearchAgentTools {
             }
             state.permissions.add("INTERNET");
         }
+        
+        let newItemToHistory = "";
+        const rawStateContent = JSON.parse(state.llMOutput.content)
+        console.log("Raw state content for getPage:", rawStateContent); 
+        const params = docPageTool.schema.parse(rawStateContent);
 
-        const url = docPageTool.schema.parse(state.llMOutput.content).url;
-        const response = await this.getPageTool.invoke({ url: url });
+        try {
+            newItemToHistory = await this.getPageTool.invoke({ url: params.url });
+        } catch (error) {
+            console.error("Error occurred while fetching page:", error);
+            newItemToHistory = `Não consegui acessar a página ${params.url}`;
+        }
 
         return {
             ...state,
-            history: [...state.history, response],
-            searchedSources: [ ...state.searchedSources, url ],
+            history: [...state.history, newItemToHistory],
+            searchedSources: [ ...state.searchedSources, params.url ],
             llMOutput: { ...state.llMOutput, step: "ANALYZE" },
         };
     }

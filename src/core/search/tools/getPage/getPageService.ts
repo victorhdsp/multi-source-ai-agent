@@ -17,10 +17,10 @@ export class GetPageService implements IGetService {
         }
 
         const stdout = await curl.stdout.text();
+
         if (!stdout || stdout.length === 0) {
             throw new Error(COMMAND_ERRORS.INVALID_URL);
         }
-        
         return stdout;
     }
 }

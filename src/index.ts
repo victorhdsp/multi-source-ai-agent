@@ -1,13 +1,18 @@
-import { callToMultiAgentUseCase } from "./dependences";
+import { callToMultiAgentUseCase, dependencies } from "./dependences";
 
 async function main() {
-    console.log("Question Agent Service is running...");
+    console.log("Agent Service is running...");
 
     const response = await callToMultiAgentUseCase.execute("Quando Charles Darwin morreu?");
-    console.log("Response from Question Agent Service:", response);
+    console.log("Response from Agent Service:", response);
 }
 
-main();
+dependencies.init().then(() => {
+    console.log("Dependencies initialized successfully.");
+    main();
+}).catch((error) => {
+    console.error("Error initializing dependencies:", error);
+});
 
 // ```json - RESPOSTA COM INFORMAÇÃO NO RAG
 // {

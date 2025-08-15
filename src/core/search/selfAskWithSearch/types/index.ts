@@ -1,5 +1,5 @@
 import z from "zod";
-import { QuestionAgent } from "../../../models/llmAgentResponse.dto";
+import { QuestionAgent } from "../../../question/questionAgent.dto";
 
 export const selfAskState = z.object({
 	step: z.string(),

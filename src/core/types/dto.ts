@@ -1,4 +1,4 @@
-import type { QuestionAgentDTO } from "../models/llmAgentResponse.dto";
+import type { QuestionAgentDTO } from "../question/questionAgent.dto";
 import type { AgentSourceType } from "./source";
 
 export interface MultiAgentDTO {

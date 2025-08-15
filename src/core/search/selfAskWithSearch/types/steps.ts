@@ -3,6 +3,7 @@ export const SEARCH_AGENT_STEPS = {
 	ANALYZE: "ANALYZE",
 	GET_MUSIC_DB: "GET_MUSIC_DB",
 	GET_PAGE: "GET_PAGE",
+	ERROR: "ERROR",
 }
 
 export type SearchAgentStep = keyof typeof SEARCH_AGENT_STEPS;

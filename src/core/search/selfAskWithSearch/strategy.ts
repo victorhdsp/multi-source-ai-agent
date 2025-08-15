@@ -1,4 +1,4 @@
-import { ChatPromptTemplate } from "@langchain/core/prompts";
+import { ChatPromptTemplate, type BaseMessagePromptTemplateLike } from "@langchain/core/prompts";
 import { toJsonSchema } from "@langchain/core/utils/json_schema";
 import type { IAgentLLMService } from "@/src/infra/interfaces/agentLlm.gateway";
 import { AnswerTypeStrategy } from "../../types/answerType";
@@ -9,37 +9,77 @@ import { ERROR_MESSAGE } from "@/src/config";
 import type { resolveToolType } from "../tools/type";
 
 export class SelfAskWithSearchStrategy {
+    public readonly boundCallNode;
+    public readonly boundRoute;
+    private bindedTools: boolean = false;
+
     constructor(
         private readonly model: IAgentLLMService,
         readonly searchAgentTools: resolveToolType[] = []
     ) {
         if (this.model.bindTools) {
             this.model.bindTools(searchAgentTools);
+            this.bindedTools = true;
         } else {
             console.error("Este modelo não suporta vinculação de ferramentas");
         }
+        this.boundCallNode = this.callNode.bind(this);
+        this.boundRoute = this.route.bind(this);
     }
 
-    private agentSearchPrompt = [
-        { role: "system", content: "Você é um agente especialista na decomposição de problemas."},
-        { role: "system", content: "Seu objetivo é {objective}."},
-        { role: "user", content: "Com base no objetivo, preciso responder o seguinte problema: {problem}."},
-        { role: "user", content: "Temos essa lista de informações que estão faltando: {missing}, você tem permissão para adicionar novos items, bem como remover conforme necessário para resolver o problema."},
-        { role: "user", content: "Você deve modificar o content" },
-        { role: "user", content: "Você deve incrementar {output} e seu trabalho termina quando tiver informações o suficiente para resolver o problema."},
-        { role: "user", content: "Você deve responder com o seguinte formato: {format_instructions}"},
+    private agentSearchPrompt: BaseMessagePromptTemplateLike[] = [
+        { role: "system", content: "Você faz parte de um time de agentes que tem como objetivo resolver o problema enviado pelo cliente, antes do problema chegar em você ele já passou pelo 'assistente' que fez uma análise inicial, classificou o tipo do problema como {problem_type} e começou a decompor o problema em partes menores."},
+        { role: "user", content: "Você precisa dar uma solução se conseguir para o problema do usuário seguindo o formato da classificação seguindo o seu objetivo: {objective}" },
+        { role: "user", content: "Caso você não tenha informação o suficiente para solucionar o problema no seu histórico de informações, você pode usar alguma das ferramentas disponíveis para incremetar o histórico de informações e tentar novamente." },
+        { role: "user", content: "Caso olhando para as ferramentas disponíveis você ache que não vai conseguir obter a resposta, então retorne um erro, mas jamais responda sem ter uma informação precisa disponível." },
+        { role: "user", content: "O histórico atual de informações é: {history}" },
+        { role: "user", content: "Você vai receber uma lista de informações faltantes que devem ser importantes para resolver o problema, você pode adicionar novas informações que você julgar necessário, você tambem pode remover, porém apenas se no histórico tiver a informação que responda essa pergutna." },
+        { role: "user", content: "Esse é um schema feito no Zod que representa o formato da resposta, ela sempre deve seguir esse schema: {format_instructions}, dentro do schema tem `type` que não deve ser modficado, `step` é usado para que o cliente tenha noção do passo atual, porém eles tem valores específicos que são: {steps}, caso você consiga responder a pergunta utilize o step de erro e caso esteja resolvido mesmo que ainda tenha perguntas use o step de STOP." },
+        { role: "user", content: "O problema do usuário é: {problem}" },
+        { role: "user", content: "As informações faltantes são: {missing}" },
     ]
+
+    private useTools() {
+        if (this.bindedTools) {
+            return [];
+        }
+
+        const tools = this.searchAgentTools.map(tool => {
+            const schema = (toJsonSchema(tool.schema) as any).properties;
+            return `Nome da ferramenta: ${tool.name}, Descrição da ferramenta e como usar: ${tool.description}, Schema do input esperado pela ferramenta: ${schema}`;
+        }).join("\n");
+
+        const prompt: BaseMessagePromptTemplateLike[] = [
+            { role: "user", content: "Você tem as seguintes ferramentas disponíveis para utilizar: " },
+            { role: "user", content: tools },
+            { role: "user", content: "Para utilizar essas ferramentas, seguindo o schema, você deve marcar o step correspondente e o content deve ser uma string contendo o schema de parâmetros." }
+        ];
+        return prompt;
+    }
 
     private async formatAgentPrompt(state: SearchAgentDTO): Promise<ChatPromptTemplate> {
         const format = (toJsonSchema(selfAskState) as any).properties;
 
-        const prompt = ChatPromptTemplate.fromMessages(this.agentSearchPrompt)
+        const problemType = Object.entries(AnswerTypeStrategy).map(([key, value]) => {
+            return `"${key}" - "${value}"`;
+        }).join(", ");
+
+        const history = state.history.join("\n");
+
+        const steps = Object.keys(SEARCH_AGENT_STEPS).join(", ");
+
+        const prompt = ChatPromptTemplate.fromMessages([
+            ...this.agentSearchPrompt,
+            ...this.useTools()
+        ])
             .partial({
+                problem_type: problemType,
                 objective: AnswerTypeStrategy[state.llMOutput.type],
+                history: history,
+                format_instructions: `${JSON.stringify(format)}`,
+                steps: steps,
                 problem: state.userInput,
                 missing: state.llMOutput.missing.join(", "),
-                output: state.history.join(", "),
-                format_instructions: `${JSON.stringify(format)}`
             });
 
         return prompt;
@@ -50,10 +90,12 @@ export class SelfAskWithSearchStrategy {
         const chain = prompt.pipe(this.model)
         const chainResult = await chain.invoke({});
         const rawContent = chainResult.text.replace("```json", "").replace("```", "");
+
         try {
             const rawParsedOutput = JSON.parse(rawContent);
+            rawParsedOutput.type = state.llMOutput.type;
             const output = selfAskState.parse(rawParsedOutput);
-
+            
             return {
                 ...state,
                 llMOutput: output as SelfAskDTO,
@@ -62,7 +104,6 @@ export class SelfAskWithSearchStrategy {
         } catch (error) {
             throw new Error(ERROR_MESSAGE.FAIL_TO_PARSE)
         }
-
     }
 
     async route(state: SearchAgentDTO): Promise<string> {
@@ -73,7 +114,7 @@ export class SelfAskWithSearchStrategy {
         if (state.llMOutput.missing.length === 0) {
             return SEARCH_AGENT_STEPS.STOP;
         }
-
+        
         return state.llMOutput.step;
     }
 }

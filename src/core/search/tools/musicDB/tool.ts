@@ -1,15 +1,21 @@
 import { tool } from "@langchain/core/tools";
-import type { DocumentTool } from "../type";
+import type { DocumentTool, ITool } from "../type";
 import type { DatabaseConsume, IFindDatabaseService } from "./types";
-import type { GenericTool } from "../genericTool";
 
-//const db = new Database(`${SQL_DATABASE_PATH}/music.db`);
-
-export class FindMusicDBTool implements GenericTool {
+export class FindMusicDBTool {
+  public readonly current;
+  
   constructor(
     private readonly document: DocumentTool,
     private readonly service: IFindDatabaseService
-  ) { }
+  ) {
+    this.current = tool(
+      async (params: DatabaseConsume) => {
+        return await this.execute(params);
+      },
+      this.document
+    );
+  }
 
   async execute(params: DatabaseConsume): Promise<string> {
     const rawResponse = await this.service.selectFromDatabase(params);
@@ -28,20 +34,7 @@ export class FindMusicDBTool implements GenericTool {
       `Resultado:\n` +
       rows.join("\n") 
     )
+    
     return response;
-  }
-
-  invoke() {
-    return tool(
-      async (params: DatabaseConsume) => {
-        try {
-          return this.execute(params);
-        } catch (err) {
-          const error = err as Error;
-          throw new Error(error.message || "Failed to get music database content");
-        }
-      },
-      this.document
-    );
   }
 }

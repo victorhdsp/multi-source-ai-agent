@@ -3,9 +3,9 @@ import type { QuestionAgentUsecase } from "./question/usecase";
 import type { SearchAgentUsecase } from "./search/usecase";
 import type { ExecuteAgentUsecase } from "./execute/usecase";
 import type { ResearchInterferenceUsecase } from "./interference/research.usecase";
-import type { CheckResultUsecase } from "./interference/checkResult.usecase";
 import { multiAgentState } from "./types/state";
 import { MULTI_AGENT_STEPS } from "./types/steps";
+import type { CheckResultInterferenceUsecase } from "./interference/checkResult.usecase";
 
 type MultiAgentState = typeof multiAgentState;
 
@@ -15,16 +15,16 @@ export class MultiAgentUseCase {
         private readonly searchUsecase: SearchAgentUsecase,
         private readonly executeUsecase: ExecuteAgentUsecase,
         private readonly researchUsecase: ResearchInterferenceUsecase,
-        private readonly checkResultUsecase: CheckResultUsecase
+        private readonly checkResultUsecase: CheckResultInterferenceUsecase
     ) {}
 
     private executeGraph (prompt: string) {
         const workflow = new StateGraph<MultiAgentState>(multiAgentState)
-            .addNode("questionNode", this.questionUsecase.callNode, {
-                retryPolicy: this.questionUsecase.errorPolicy,
+            .addNode("questionNode", this.questionUsecase.boundCallNode, {
+                retryPolicy: this.questionUsecase.boundErrorPolicy,
             })
-            .addNode("searchNode", this.searchUsecase.callNode, {
-                retryPolicy: this.searchUsecase.errorPolicy
+            .addNode("searchNode", this.searchUsecase.boundCallNode, {
+                retryPolicy: this.searchUsecase.boundErrorPolicy
             })
             // .addNode("researchNode", this.researchUsecase.callNode, {
             //     retryPolicy: this.researchUsecase.errorPolicy
@@ -67,7 +67,9 @@ export class MultiAgentUseCase {
     async execute(prompt: string): Promise<string> {
         const workflow = this.executeGraph(prompt);
         const agent = workflow.compile();
-        const result = await agent.invoke({ userInput: prompt });
+        const result = await agent.invoke({ 
+            input: prompt
+         });
 
         if (result.llMOutput) {
             return result.llMOutput.content;

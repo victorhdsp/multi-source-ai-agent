@@ -39,10 +39,10 @@ describe("SelfAskWithSearch.callNode", () => {
 
     test("should handle error response", async () => {
         const model = new mockAgentLLMService(`{
-            "step": "STOP",
+            "step": "ERROR",
             "content": "An error occurred",
-            "missing": [],
-            "type": "ERROR"
+            "missing": "test",
+            "type": "QUERY"
         }`);
         const selfAskWithSearch = new SelfAskWithSearchStrategy(model);
 

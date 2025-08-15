@@ -12,6 +12,7 @@
   "scripts": {
     "build": "bun build src/index.ts --outdir dist --target node",
     "start": "bun run dist/index.js",
+    "dev": "bun run src/index.ts",
     "embedding": "bun run src/tools/embeddingDocuments.ts",
     "metadata": "bun run src/tools/metadataSQLDatabase.ts"
   },

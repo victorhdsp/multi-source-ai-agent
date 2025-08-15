@@ -1,5 +1,5 @@
 import type { AgentSourceType } from "../../../types/source";
-import type { QuestionAgentDTO } from "../../../models/llmAgentResponse.dto";
+import type { QuestionAgentDTO } from "../../../question/questionAgent.dto";
 import type { SearchAgentStep } from "./steps";
 import type { SearchAgentPermissions } from "./permissions";
 

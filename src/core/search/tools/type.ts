@@ -8,7 +8,7 @@ export interface DocumentTool {
 }
 
 export interface ITool {
-  invoke: () => DynamicTool | DynamicStructuredTool;
+  current: (DynamicTool | DynamicStructuredTool);
 }
 
 export type resolveToolType = DynamicTool | DynamicStructuredTool

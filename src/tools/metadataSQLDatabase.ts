@@ -5,7 +5,7 @@ import { SQL_DATABASE_PATH } from "../config";
 import { AgentLLMService } from "../infra/gateway/agentLlm.service";
 import { ChatPromptTemplate } from "@langchain/core/prompts";
 import { toJsonSchema } from "@langchain/core/utils/json_schema";
-import { databaseMetadataSchema } from "../core/models/databaseMetadata";
+import { databaseMetadataSchema } from "../core/search/tools/musicDB/databaseMetadata";
 
 function generateMetadata(dbPath: string, sampleSize = 5) {
     if (!fs.existsSync(dbPath)) {

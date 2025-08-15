@@ -40,6 +40,7 @@ class Dependencies {
       embedding
     ),
     model = new AgentLLMService(),
+    
     getPageTool = new GetPageTool(
       docPageTool,
       getPageService
@@ -87,7 +88,6 @@ class Dependencies {
   }
 }
 
-const dependencies = new Dependencies();
-dependencies.init();
+export const dependencies = new Dependencies();;
 
 export const { callToMultiAgentUseCase } = dependencies;

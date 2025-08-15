@@ -38,7 +38,6 @@ export class AgentLLMService extends BaseChatModel {
             if (tryCount > 0) {
                 return await this.secondaryLLM._generate(messages, options, runManager);
             }
-
             return await this.primaryLLM._generate(messages, options, runManager);
 
         } catch (err) {
