@@ -2,8 +2,9 @@ import { END, START, StateGraph, type RetryPolicy } from "@langchain/langgraph";
 import type { IGenericAgentUsecase } from "../interfaces/GenericAgent.usecase";
 import { SEARCH_AGENT_STEPS, searchAgentState, type SearchAgentDTO, type SearchAgentState } from "./strategy/strategy";
 import type { SelfAskWithSearchService } from "./strategy/service";
-import { MULTI_AGENT_STEPS, type MultiAgentDTO } from "../strategy";
+import { type MultiAgentDTO } from "../types";
 import type { SearchAgentTools } from "./tools/service";
+import { MULTI_AGENT_STEPS } from "../types/steps";
 
 export class SearchAgentUsecase implements IGenericAgentUsecase{
     constructor(

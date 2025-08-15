@@ -1,8 +1,8 @@
 import { interrupt } from "@langchain/langgraph";
 import type { SearchAgentDTO } from "../strategy/strategy";
-import { findDBMusicTool } from "./getMusicDB.tool";
 import { getPageTool } from "./getPage.tool";
 import { ERROR_MESSAGE, HUMAN_REQUEST, HUMAN_RESPONSE } from "@/src/config";
+import { findDBMusicTool } from "./getMusicDB.tool";
 
 export const searchAgentTools = [getPageTool, findDBMusicTool];
 
@@ -53,6 +53,16 @@ export class SearchAgentTools {
     }
 
     async getMusicDB (state: SearchAgentDTO): Promise<SearchAgentDTO> {
-        return findDBMusicTool;
+        const rawStateContent = JSON.parse(state.llMOutput.content);
+        const { table, columns, filters } = findDBMusicTool.schema.parse(rawStateContent);
+
+        const response = await findDBMusicTool.invoke({ table, columns, filters });
+        const resultContent = response.join("\n");
+
+        return {
+            ...state,
+            history: [...state.history, resultContent],
+            searchedSources: [ ...state.searchedSources, `music_db:${table}` ],
+        }
     }
 }

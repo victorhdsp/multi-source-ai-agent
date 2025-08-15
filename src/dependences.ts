@@ -1,9 +1,9 @@
 import { TaskType } from "@google/generative-ai";
 import { GoogleGenerativeAIEmbeddings } from "@langchain/google-genai";
-import { AgentLLMService } from "./infra/interfaces/agentLlm.service";
-import { LlmAgentResponseParser } from "./core/utils/outputParser/LlmAgentResponse.parser";
+import { AgentLLMService } from "./infra/gateway/agentLlm.service";
+import { QuestionAgentParser } from "./core/utils/outputParser/QuestionAgent.parser";
 import { VectorStore } from "./infra/repository/vector.repository";
-import { QuestionAgentService } from "./core/question/service";
+import { QuestionAgentService } from "./core/question/strategy";
 import { QuestionAgentUsecase } from "./core/question/usecase";
 import { VECTOR_DATABASE_PATH } from "./config";
 import { CallToMultiAgentUseCase } from "./core/usecase";
@@ -19,7 +19,7 @@ class Dependencies {
     }),
     agentLLM = new AgentLLMService(),
     private vectorDB = new VectorStore(embedding),
-    parser = new LlmAgentResponseParser(),
+    parser = new QuestionAgentParser(),
     questionService = new QuestionAgentService(agentLLM, parser),
     questionUsecase = new QuestionAgentUsecase(vectorDB, questionService),
     

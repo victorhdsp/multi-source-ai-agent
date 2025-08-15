@@ -1,11 +1,11 @@
 import { START, END, StateGraph } from "@langchain/langgraph";
 import type { QuestionAgentUsecase } from "./question/usecase";
-import { searchAgentState, type SearchAgentState } from "./search/strategy/strategy";
 import type { SearchAgentUsecase } from "./search/usecase";
 import type { ExecuteAgentUsecase } from "./execute/usecase";
 import type { ResearchInterferenceUsecase } from "./interference/research.usecase";
 import type { CheckResultUsecase } from "./interference/checkResult.usecase";
-import { MULTI_AGENT_STEPS, multiAgentState } from "./strategy";
+import { multiAgentState } from "./types";
+import { MULTI_AGENT_STEPS } from "./types/steps";
 
 type MultiAgentState = typeof multiAgentState;
 

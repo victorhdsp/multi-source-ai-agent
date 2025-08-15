@@ -1,7 +1,8 @@
-import { LlmAgentResponse, type LlmAgentResponseDTO } from "../models/llmAgentResponse.dto";
+
 import { ChatPromptTemplate } from "@langchain/core/prompts";
-import { AgentLLMService } from "@/src/infra/interfaces/agentLlm.service";
 import { toJsonSchema } from "@langchain/core/utils/json_schema";
+import type { IAgentLLMService } from "@/src/infra/interfaces/agentLlm.gateway";
+import { QuestionAgent, type QuestionAgentDTO } from "../models/llmAgentResponse.dto";
 
 export const agentQuestionPrompt = [
     { role: "system", content: "Você é um assistente em tarefas de resposta a perguntas. Use os seguintes trechos de contexto recuperados para responder à pergunta. Se você não souber a resposta, apenas diga que não sabe. Use no máximo três frases e mantenha a resposta concisa." },
@@ -10,13 +11,13 @@ export const agentQuestionPrompt = [
     { role: "user", content: "{format_instructions}" }
 ]
 
-export class QuestionAgentService {
+export class QuestionAgentStrategy {
     constructor(
-        private readonly model: AgentLLMService,
+        private readonly model: IAgentLLMService,
     ) {}
 
     async formatQuestionPrompt(question: string, content: string): Promise<ChatPromptTemplate> {
-        const format = (toJsonSchema(LlmAgentResponse) as any).properties;
+        const format = (toJsonSchema(QuestionAgent) as any).properties;
         
         const prompt = await ChatPromptTemplate.fromMessages(agentQuestionPrompt)
             .partial({
@@ -34,9 +35,9 @@ export class QuestionAgentService {
         return chainResult.text;
     }
 
-    async parseOutput(output: string): Promise<LlmAgentResponseDTO> {
+    async parseOutput(output: string): Promise<QuestionAgentDTO> {
         const rawContent = output.replace("```json", "").replace("```", "");
         const rawParsedOutput = JSON.parse(rawContent);
-        return LlmAgentResponse.parse(rawParsedOutput) as LlmAgentResponseDTO;
+        return QuestionAgent.parse(rawParsedOutput) as QuestionAgentDTO;
     }
 }

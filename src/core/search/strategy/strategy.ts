@@ -1,9 +1,6 @@
 import z from "zod";
-import { LlmAgentResponse, type LlmAgentResponseDTO } from "../../models/llmAgentResponse.dto";
-import type { MULTI_AGENT_SOURCE_VARS } from "../../strategy";
-import type { searchAgentTools } from "../tools/service";
-import type { docFindDBMusicTool } from "../tools/getMusicDB.tool";
-import type { docPageTool } from "../tools/getPage.tool";
+import type { AgentSourceType } from "../../types/source";
+import { QuestionAgent, type QuestionAgentDTO } from "../../models/llmAgentResponse.dto";
 
 export const SEARCH_AGENT_PERMISSIONS = {
 	INTERNET: "INTERNET"
@@ -18,21 +15,20 @@ export const SEARCH_AGENT_STEPS = {
 
 export type SearchAgentSourceStep = keyof typeof SEARCH_AGENT_STEPS;
 export type SearchAgentSourcePermissions = keyof typeof SEARCH_AGENT_PERMISSIONS;
-export type SearchAgentSourceType = keyof typeof MULTI_AGENT_SOURCE_VARS | string;
 
-export interface LLMSearchResponseDTO extends LlmAgentResponseDTO {
+export interface LLMSearchResponseDTO extends QuestionAgentDTO {
 	step: SearchAgentSourceStep,
 }
 
 export const llmSearchResponse = z.object({
-	step: z.enum(Object.values(SEARCH_AGENT_STEPS)),
-	...LlmAgentResponse.shape,
+	step: z.string(),
+	...QuestionAgent.shape,
 })
 
 export interface SearchAgentDTO {
 	userInput: string,
 	permissions: Set<SearchAgentSourcePermissions>,
-	searchedSources: SearchAgentSourceType[],
+	searchedSources: AgentSourceType[],
 	history: string[],
 	llMOutput: LLMSearchResponseDTO,
 	error?: string
@@ -41,7 +37,7 @@ export interface SearchAgentDTO {
 
 export const searchAgentState = z.object({
 	userInput: z.string(),
-	permissions: z.set(z.enum(Object.values(SEARCH_AGENT_SOURCE_PERMISSIONS))),
+	permissions: z.set(z.string()),
 	searchedSources: z.array(z.string()),
 	history: z.array(z.string()).default([]),
 	llMOutput: llmSearchResponse,

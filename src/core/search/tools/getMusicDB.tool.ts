@@ -6,7 +6,7 @@ import fs from "fs";
 import { databaseMetadataSchema } from '../../models/databaseMetadata';
 
 const db = new Database(`${SQL_DATABASE_PATH}/music.db`);
-const rawMetadata = fs.readFileSync(`${SQL_DATABASE_PATH}/music_metadata.json`, {encoding: "utf-8"});
+const rawMetadata = fs.readFileSync(`${SQL_DATABASE_PATH}/music_metadata.json`, { encoding: "utf-8" });
 const metadata = databaseMetadataSchema.parse(JSON.parse(rawMetadata));
 
 let database_map = ""
@@ -18,9 +18,9 @@ for (const [tableName, tableInfo] of Object.entries(metadata.tables)) {
 }
 
 export const docFindDBMusicTool = {
-    name: "query_database",
-    description: 
-`Consulta dados no banco de dados SQLite.  
+  name: "query_database",
+  description:
+    `Consulta dados no banco de dados SQLite.  
 Banco de dados: ${metadata.database}
 Tabelas:
 ${database_map}
@@ -28,14 +28,14 @@ Regras:
 - Somente SELECT
 - Sempre filtrar com WHERE para evitar trazer tudo
 `,
-    schema: z.object({
-      table: z.string().describe("Nome da tabela para buscar"),
-      columns: z.array(z.string()).optional().describe("Colunas a serem retornadas"),
-      filters: z.string().optional().describe("Condições WHERE para filtrar resultados"),
-    }),
-  }
+  schema: z.object({
+    table: z.string().describe("Nome da tabela para buscar"),
+    columns: z.array(z.string()).optional().describe("Colunas a serem retornadas"),
+    filters: z.string().optional().describe("Condições WHERE para filtrar resultados"),
+  }),
+}
 
-export const queryDatabaseTool = tool(
+export const findDBMusicTool = tool(
   async ({ table, filters, columns }) => {
     const cols = columns?.length ? columns.join(", ") : "*";
     let query = `SELECT ${cols} FROM ${table}`;

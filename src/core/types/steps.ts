@@ -1,0 +1,6 @@
+export const MULTI_AGENT_STEPS = {
+	STOP: "STOP",
+	ERROR: "ERROR",
+	SEARCH: "SEARCH",
+	EXECUTE: "EXECUTE"
+};

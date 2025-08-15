@@ -1,12 +1,12 @@
 import { ChatPromptTemplate } from "@langchain/core/prompts";
-import { AgentLLMService } from "@/src/infra/interfaces/agentLlm.service";
 import { llmSearchResponse, SEARCH_AGENT_STEPS, searchAgentState, type LLMSearchResponseDTO, type SearchAgentDTO } from "./strategy";
-import { TypeResponseStrategy } from "../../strategy";
+import { TypeResponseStrategy } from "../../types";
 import { toJsonSchema } from "@langchain/core/utils/json_schema";
+import type { IAgentLLMService } from "@/src/infra/interfaces/agentLlm.gateway";
 
 export class SelfAskWithSearchService {
     constructor(
-        private readonly model: AgentLLMService,
+        private readonly model: IAgentLLMService,
     ) {}
 
     private agentSearchPrompt = [

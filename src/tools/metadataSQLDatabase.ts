@@ -2,7 +2,7 @@ import Database from "bun:sqlite";
 import fs from "fs";
 import path, { format } from "path";
 import { SQL_DATABASE_PATH } from "../config";
-import { AgentLLMService } from "../infra/interfaces/agentLlm.service";
+import { AgentLLMService } from "../infra/gateway/agentLlm.service";
 import { ChatPromptTemplate } from "@langchain/core/prompts";
 import { toJsonSchema } from "@langchain/core/utils/json_schema";
 import { databaseMetadataSchema } from "../core/models/databaseMetadata";
