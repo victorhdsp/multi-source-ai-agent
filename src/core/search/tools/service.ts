@@ -1,12 +1,28 @@
-import { interrupt } from "@langchain/langgraph";
-import { getPageTool } from "./getPage.tool";
-import { ERROR_MESSAGE, HUMAN_REQUEST, HUMAN_RESPONSE } from "@/src/config";
-import { findDBMusicTool } from "./getMusicDB.tool";
-import type { SearchAgentDTO } from "../selfAskWithSearch/types/dto";
 
-export const searchAgentTools = [getPageTool, findDBMusicTool];
+import { interrupt } from "@langchain/langgraph";
+import { ERROR_MESSAGE, HUMAN_REQUEST, HUMAN_RESPONSE } from "@/src/config";
+import { findDBMusicTool } from "./musicDB/getMusicDB.tool";
+import type { SearchAgentDTO } from "../selfAskWithSearch/types/dto";
+import type { ITool, resolveToolType } from "./type";
+import type { DynamicStructuredTool, DynamicTool } from "@langchain/core/tools";
+import { docPageTool } from "./getPage/doc";
 
 export class SearchAgentTools {
+    searchAgentTools: resolveToolType[] = [];
+    getPageTool: resolveToolType;
+    findDBMusicTool: resolveToolType;
+
+    constructor(
+        getPageTool: ITool,
+        findDBMusicTool: DynamicStructuredTool | DynamicTool
+    ){
+        this.getPageTool = getPageTool.invoke();
+        this.findDBMusicTool = findDBMusicTool;
+
+        this.searchAgentTools.push(this.getPageTool);
+        this.searchAgentTools.push(this.findDBMusicTool);
+    }
+
     private talkToHuman(prompt: string): boolean {
         const rawResponse = interrupt({
             type: HUMAN_REQUEST.PERMISSION,
@@ -42,8 +58,8 @@ export class SearchAgentTools {
             state.permissions.add("INTERNET");
         }
 
-        const url = getPageTool.schema.parse(state.llMOutput.content).url;
-        const response = await getPageTool.invoke({ url: url });
+        const url = docPageTool.schema.parse(state.llMOutput.content).url;
+        const response = await this.getPageTool.invoke({ url: url });
 
         return {
             ...state,

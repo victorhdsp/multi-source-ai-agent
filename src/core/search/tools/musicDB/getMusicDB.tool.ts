@@ -3,7 +3,7 @@ import { tool } from "@langchain/core/tools";
 import z from "zod";
 import Database from "bun:sqlite";
 import fs from "fs";
-import { databaseMetadataSchema } from '../../models/databaseMetadata';
+import { databaseMetadataSchema } from '../../../models/databaseMetadata';
 
 const db = new Database(`${SQL_DATABASE_PATH}/music.db`);
 const rawMetadata = fs.readFileSync(`${SQL_DATABASE_PATH}/music_metadata.json`, { encoding: "utf-8" });

@@ -5,12 +5,13 @@ import { AnswerTypeStrategy } from "../../types/answerType";
 import { SEARCH_AGENT_STEPS } from "./types/steps";
 import type { SearchAgentDTO, SelfAskDTO } from "./types/dto";
 import { selfAskState } from "./types";
-import { searchAgentTools } from "../tools/service";
 import { ERROR_MESSAGE } from "@/src/config";
+import type { resolveToolType } from "../tools/type";
 
 export class SelfAskWithSearchStrategy {
     constructor(
         private readonly model: IAgentLLMService,
+        readonly searchAgentTools: resolveToolType[] = []
     ) {
         if (this.model.bindTools) {
             this.model.bindTools(searchAgentTools);
