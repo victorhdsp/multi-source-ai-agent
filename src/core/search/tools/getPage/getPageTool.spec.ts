@@ -1,13 +1,17 @@
 import { describe, expect, test } from "bun:test"
 
-import { GetPageService } from "./getService";
+import { GetPageService } from "./getPageService";
+import { GetPageTool } from "./tool";
+import { docPageTool } from "./doc";
 
 describe("GetPageService.getPage", () => {
+    const service = new GetPageService();
+    const tool = new GetPageTool(docPageTool, service);
+
     test.todo("should return page content", async () => {
-        const service = new GetPageService();
         const url = "https://www.example.com";
 
-        const response = await service.getPage(url);
+        const response = await tool.execute({url});
 
         expect(response).toBeDefined();
         expect(typeof response).toBe("string");
@@ -16,9 +20,8 @@ describe("GetPageService.getPage", () => {
     });
 
     test("should throw error for invalid URL", async () => {
-        const service = new GetPageService();
         const invalidUrl = "invalid-url";
 
-        await expect(service.getPage(invalidUrl)).rejects.toThrow("Invalid URL");
+        await expect(tool.execute({url: invalidUrl})).rejects.toThrow("Invalid URL");
     });
 });

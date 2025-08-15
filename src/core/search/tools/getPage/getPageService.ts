@@ -1,5 +1,5 @@
 import { spawn } from "bun";
-import type { IGetService } from "./type";
+import type { GetPageConsume, IGetService } from "./type";
 
 const COMMAND_ERRORS = {
     INVALID_URL: "Invalid URL",
@@ -7,8 +7,8 @@ const COMMAND_ERRORS = {
 }
 
 export class GetPageService implements IGetService {
-    async getPage(url: string): Promise<string> {
-        const curl = spawn(["curl", "-X", "GET", "-s", url]);
+    async getPage(params: GetPageConsume): Promise<string> {
+        const curl = spawn(["curl", "-X", "GET", "-s", params.url]);
 
         const stderr = curl.stderr;
 
