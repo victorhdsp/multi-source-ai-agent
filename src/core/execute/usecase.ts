@@ -1,10 +1,11 @@
 import type { RetryPolicy } from "@langchain/langgraph";
 import type { IGenericAgentUsecase } from "../interfaces/GenericAgent.usecase";
-import type { SearchAgentStateDTO } from "../models/searchAgentRequest.dto";
+import type { SearchAgentStateDTO } from "../search/strategy/strategy";
+import type { NameNodes } from "../usecase";
 
 export class ExecuteAgentUsecase implements IGenericAgentUsecase {
-    callNode(state: SearchAgentStateDTO): Promise<SearchAgentStateDTO> {
-        return Promise.resolve(state);
+    async callNode(state: SearchAgentStateDTO): Promise<SearchAgentStateDTO> {
+        return ;
     }
 
     errorPolicy: RetryPolicy = {};

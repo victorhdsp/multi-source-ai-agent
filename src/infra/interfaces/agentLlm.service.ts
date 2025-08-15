@@ -14,7 +14,7 @@ export class AgentLLMService extends BaseChatModel {
         super(baseParams);
 
         this.primaryLLM = new ChatGoogleGenerativeAI({
-            model: "gemini-2.0-flash",
+            model: "gemini-2.5-flash",
             temperature: 0
         });
 

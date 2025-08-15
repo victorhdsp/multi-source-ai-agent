@@ -3,10 +3,10 @@ import { GoogleGenerativeAIEmbeddings } from "@langchain/google-genai";
 import { AgentLLMService } from "./infra/interfaces/agentLlm.service";
 import { LlmAgentResponseParser } from "./core/utils/outputParser/LlmAgentResponse.parser";
 import { VectorStore } from "./infra/repository/vector.repository";
-import { QuestionAgentService } from "./core/question/agent.service";
+import { QuestionAgentService } from "./core/question/service";
 import { QuestionAgentUsecase } from "./core/question/usecase";
 import { VECTOR_DATABASE_PATH } from "./config";
-import { CallToMultiAgentUseCase } from "./core/callToMultiAgent.usecase";
+import { CallToMultiAgentUseCase } from "./core/usecase";
 import { SearchAgentUsecase } from "./core/search/usecase";
 import { ExecuteAgentUsecase } from "./core/execute/usecase";
 

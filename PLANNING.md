@@ -168,3 +168,10 @@ flowchart TD
     response-permission -->|Sim| response-execute
     response-permission -->|Não| response-error
 ```
+
+## Observações
+- Resolvi fazer 2 ferramentas para ajudar no processo de dia a dia, o primeiro é uma feramenta para fazer embedding de documentos e o segundo é uma ferramenta para buscar informações no banco de dados SQLite;
+
+- Essas ferramentas são usadas durante o build e elas permitem facilitar o processo de tornar o programa agnostico a dados, ou seja, se quiser adicionar novos documentos ou novos dados no banco de dados, basta rodar essas ferramentas e elas vão atualizar os embeddings e o banco de dados automaticamente;
+
+    - Por falta de tempo, o banco de dados ainda não é totalmente agnostico, ele tem a coleta de metadados (precisa de revisão porque a confiabilidade é baixa, depende de como o usuário nomeia as tabelas e colunas), mas ainda não criei a tool automaticamente, então preciso criar a tool manualmente para cada banco de dados que eu quiser usar;
