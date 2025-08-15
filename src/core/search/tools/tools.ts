@@ -8,8 +8,8 @@ import { docFindDBMusicTool } from "./musicDB/doc";
 
 export class SearchAgentTools {
     searchAgentTools: resolveToolType[] = [];
-    getPageTool: resolveToolType;
-    findDBMusicTool: resolveToolType;
+    protected getPageTool: resolveToolType;
+    protected findDBMusicTool: resolveToolType;
 
     constructor(
         getPageTool: ITool,
@@ -64,6 +64,7 @@ export class SearchAgentTools {
             ...state,
             history: [...state.history, response],
             searchedSources: [ ...state.searchedSources, url ],
+            llMOutput: { ...state.llMOutput, step: "ANALYZE" },
         };
     }
 
@@ -78,6 +79,7 @@ export class SearchAgentTools {
             ...state,
             history: [...state.history, resultContent],
             searchedSources: [ ...state.searchedSources, `music_db:${table}` ],
+            llMOutput: { ...state.llMOutput, step: "ANALYZE" },
         }
     }
 }

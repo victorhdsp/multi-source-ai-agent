@@ -1,14 +1,14 @@
 import { tool } from "@langchain/core/tools";
 import type { DocumentTool } from "../type";
-import type { DatabaseConsume, ISelectDatabaseService } from "./types";
+import type { DatabaseConsume, IFindDatabaseService } from "./types";
 import type { GenericTool } from "../genericTool";
 
 //const db = new Database(`${SQL_DATABASE_PATH}/music.db`);
 
-export class GetMusicDBTool implements GenericTool {
+export class FindMusicDBTool implements GenericTool {
   constructor(
     private readonly document: DocumentTool,
-    private readonly service: ISelectDatabaseService
+    private readonly service: IFindDatabaseService
   ) { }
 
   async execute(params: DatabaseConsume): Promise<string> {

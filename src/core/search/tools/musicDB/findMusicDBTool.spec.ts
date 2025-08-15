@@ -1,15 +1,15 @@
 import { describe, test, expect } from "bun:test";
 import { Database } from "bun:sqlite";
-import { SelectMusicDBService } from "./selectMusicDBService"
+import { FindMusicDBService } from "./findMusicDBService"
 import { SQL_DATABASE_PATH } from "@/src/config";
-import { GetMusicDBTool } from "./tool";
+import { FindMusicDBTool } from "./tool";
 import { docFindDBMusicTool } from './doc';
 
-describe("SelectMusicDBService.selectFromDatabase", () => {
+describe("FindMusicDBService.selectFromDatabase", () => {
     const db = new Database(`${SQL_DATABASE_PATH}/music.db`);
 
-    const service = new SelectMusicDBService(db);
-    const tool = new GetMusicDBTool(docFindDBMusicTool, service);
+    const service = new FindMusicDBService(db);
+    const tool = new FindMusicDBTool(docFindDBMusicTool, service);
 
     test("should return music data", async () => {
         const params = {

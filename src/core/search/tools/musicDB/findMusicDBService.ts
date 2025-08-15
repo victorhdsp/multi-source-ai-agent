@@ -1,7 +1,7 @@
 import type Database from "bun:sqlite";
-import type { DatabaseConsume, ISelectDatabaseService } from "./types";
+import type { DatabaseConsume, IFindDatabaseService } from "./types";
 
-export class SelectMusicDBService implements ISelectDatabaseService {
+export class FindMusicDBService implements IFindDatabaseService {
     constructor(
         private readonly db: Database
     ) {}

@@ -1,5 +1,5 @@
-import { DynamicStructuredTool, tool } from "@langchain/core/tools";
-import type { DocumentTool, ITool } from "../type";
+import { tool } from "@langchain/core/tools";
+import type { DocumentTool } from "../type";
 import type { GetPageConsume, IGetService } from "./type";
 import type { GenericTool } from "../genericTool";
 

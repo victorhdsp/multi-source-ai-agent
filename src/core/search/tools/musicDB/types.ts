@@ -8,6 +8,6 @@ export const databaseConsumeSchema = z.object({
 
 export type DatabaseConsume = z.infer<typeof databaseConsumeSchema>;
 
-export interface ISelectDatabaseService {
+export interface IFindDatabaseService {
   selectFromDatabase(params: DatabaseConsume): Promise<Record<string, unknown>[]>;
 }

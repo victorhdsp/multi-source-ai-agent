@@ -1,6 +1,6 @@
 import { END, START, StateGraph, type RetryPolicy } from "@langchain/langgraph";
 import type { IGenericAgentUsecase } from "../interfaces/GenericAgent.usecase";
-import type { SearchAgentTools } from "./tools/service";
+import type { SearchAgentTools } from "./tools/tools";
 import { MULTI_AGENT_STEPS } from "../types/steps";
 import type { SelfAskWithSearchStrategy } from "./selfAskWithSearch/strategy";
 import type { MultiAgentDTO } from "../types/dto";
@@ -15,13 +15,12 @@ export class SearchAgentUsecase implements IGenericAgentUsecase{
     ){}
 
     async callNode(state: MultiAgentDTO): Promise<MultiAgentDTO> {
-        
         const workflow = new StateGraph<SearchAgentState>(searchAgentState)
-            .addNode("agentNode", this.strategyService.callNode)
-            .addNode("decisionNode", (state) => state)
-            .addNode("getPageNode", this.toolService.getPage)
-            .addNode("getMusicDbNode", this.toolService.getMusicDB);
-
+        .addNode("agentNode", this.strategyService.callNode)
+        .addNode("decisionNode", s => s)
+        .addNode("getPageNode", this.toolService.getPage)
+        .addNode("getMusicDbNode", this.toolService.getMusicDB);
+        
         workflow.addEdge(START, "agentNode");
         workflow.addEdge("agentNode", "decisionNode");
         workflow.addConditionalEdges("decisionNode", this.strategyService.route as any, {
@@ -30,9 +29,9 @@ export class SearchAgentUsecase implements IGenericAgentUsecase{
             [SEARCH_AGENT_STEPS.GET_PAGE]: "getPageNode",
             [SEARCH_AGENT_STEPS.GET_MUSIC_DB]: "getMusicDbNode",
         });
-
+        
         const agent = workflow.compile();
-
+        
         const initialState: SearchAgentDTO = {
             userInput: state.input,
             llMOutput: {
@@ -44,9 +43,9 @@ export class SearchAgentUsecase implements IGenericAgentUsecase{
             permissions: new Set(),
             numberOfSteps: 0,
         }
-
+        
         const result = await agent.invoke({ ...initialState });
-
+        
         return {
             input: result.userInput,
             llMOutput: {
