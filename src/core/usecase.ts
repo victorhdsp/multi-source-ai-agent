@@ -19,52 +19,60 @@ export class MultiAgentUseCase {
     ) {}
 
     private executeGraph (prompt: string) {
-        const graph = new StateGraph<MultiAgentState>(multiAgentState)
+        const workflow = new StateGraph<MultiAgentState>(multiAgentState)
             .addNode("questionNode", this.questionUsecase.callNode, {
                 retryPolicy: this.questionUsecase.errorPolicy,
             })
             .addNode("searchNode", this.searchUsecase.callNode, {
                 retryPolicy: this.searchUsecase.errorPolicy
             })
-            .addNode("researchNode", this.researchUsecase.callNode, {
-                retryPolicy: this.researchUsecase.errorPolicy
-            })
-            .addNode("checkResultNode", this.checkResultUsecase.callNode, {
-                retryPolicy: this.checkResultUsecase.errorPolicy
-            })
-            .addNode("executeNode", this.executeUsecase.callNode, {
-                retryPolicy: this.executeUsecase.errorPolicy
-            })
-            .addNode("errorNode", async (state) => {
-                return state;
-            });
+            // .addNode("researchNode", this.researchUsecase.callNode, {
+            //     retryPolicy: this.researchUsecase.errorPolicy
+            // })
+            // .addNode("checkResultNode", this.checkResultUsecase.callNode, {
+            //     retryPolicy: this.checkResultUsecase.errorPolicy
+            // })
+            // .addNode("executeNode", this.executeUsecase.callNode, {
+            //     retryPolicy: this.executeUsecase.errorPolicy
+            // })
+            // .addNode("errorNode", async (state) => {
+            //     return state;
+            // });
 
-        graph.addEdge(START, "questionNode");
+        workflow.addEdge(START, "questionNode");
+        workflow.addEdge("questionNode", "searchNode");
 
-        graph.addConditionalEdges("questionNode", this.questionUsecase.route as any, {
-            [MULTI_AGENT_STEPS.ERROR]: "errorNode",
-            [MULTI_AGENT_STEPS.SEARCH]: "researchNode",
-            [MULTI_AGENT_STEPS.EXECUTE]: "checkResultNode"
-        });
+        // workflow.addConditionalEdges("questionNode", this.questionUsecase.route as any, {
+        //     [MULTI_AGENT_STEPS.ERROR]: "errorNode",
+        //     [MULTI_AGENT_STEPS.SEARCH]: "researchNode",
+        //     [MULTI_AGENT_STEPS.EXECUTE]: "checkResultNode"
+        // });
 
-        graph.addConditionalEdges("searchNode", this.searchUsecase.route as any, {
-            [MULTI_AGENT_STEPS.ERROR]: "errorNode",
-            [MULTI_AGENT_STEPS.SEARCH]: "researchNode",
-            [MULTI_AGENT_STEPS.EXECUTE]: "checkResultNode"
-        });
+        // workflow.addConditionalEdges("searchNode", this.searchUsecase.route as any, {
+        //     [MULTI_AGENT_STEPS.ERROR]: "errorNode",
+        //     [MULTI_AGENT_STEPS.SEARCH]: "researchNode",
+        //     [MULTI_AGENT_STEPS.EXECUTE]: "checkResultNode"
+        // });
         
-        graph.addEdge("researchNode", "errorNode");
-        graph.addEdge("checkResultNode", "errorNode");
+        // workflow.addEdge("researchNode", "errorNode");
+        // workflow.addEdge("checkResultNode", "errorNode");
 
         // DEFAULT
-        graph.addEdge("executeNode", END);
-        graph.addEdge("errorNode", END);
+        // workflow.addEdge("executeNode", END);
+        // workflow.addEdge("errorNode", END);
 
-        return graph;
+        return workflow;
     }
 
     async execute(prompt: string): Promise<string> {
-        const graph = this.executeGraph(prompt);
-        return "executando";
+        const workflow = this.executeGraph(prompt);
+        const agent = workflow.compile();
+        const result = await agent.invoke({ userInput: prompt });
+
+        if (result.llMOutput) {
+            return result.llMOutput.content;
+        }
+
+        return "No output from the agent.";
     }
 }

@@ -8,7 +8,7 @@ describe("GetPageService.getPage", () => {
     const service = new GetPageService();
     const tool = new GetPageTool(docPageTool, service);
 
-    test.todo("should return page content", async () => {
+    test("should return page content", async () => {
         const url = "https://www.example.com";
 
         const response = await tool.execute({url});
