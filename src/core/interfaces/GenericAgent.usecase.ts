@@ -1,5 +1,5 @@
 import type { RetryPolicy } from "@langchain/langgraph";
-import type { SearchAgentStateDTO } from "../search/strategy/strategy";
+import type { SearchAgentStateDTO } from "../search/selfAskWithSearch/types";
 import type { NameNodes } from "../usecase";
 
 export interface IGenericAgentUsecase {

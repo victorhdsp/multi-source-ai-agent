@@ -1,7 +1,7 @@
 import { Command, END, interrupt, type RetryPolicy } from "@langchain/langgraph";
 import type { IGenericRouteUsecase } from "../interfaces/GenericAgent.usecase";
 import { ERROR_MESSAGE, HUMAN_REQUEST, HUMAN_RESPONSE } from "@/src/config";
-import type { MultiAgentDTO } from "../types";
+import type { MultiAgentDTO } from "../types/state";
 
 export class CheckResultUsecase implements IGenericRouteUsecase {
     private talkToHuman(prompt: string): boolean {

@@ -4,7 +4,7 @@ import type { SearchAgentUsecase } from "./search/usecase";
 import type { ExecuteAgentUsecase } from "./execute/usecase";
 import type { ResearchInterferenceUsecase } from "./interference/research.usecase";
 import type { CheckResultUsecase } from "./interference/checkResult.usecase";
-import { multiAgentState } from "./types";
+import { multiAgentState } from "./types/state";
 import { MULTI_AGENT_STEPS } from "./types/steps";
 
 type MultiAgentState = typeof multiAgentState;

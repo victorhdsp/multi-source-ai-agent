@@ -16,7 +16,8 @@ export const ERROR_MESSAGE = {
     NO_PERMISSION_TO_WEB_SEARCH: "Usuário não autorizou a busca na internet.",
     WRONG_INPUT: (validInputs: string[]) => {
         return `Entrada inválida. As opções válidas são: ${validInputs.join(', ')}.`;
-    }
+    },
+    FAIL_TO_PARSE: "Falha ao analisar a saída do modelo.",
 }
 
 export const HUMAN_REQUEST = {

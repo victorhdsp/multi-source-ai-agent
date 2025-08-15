@@ -8,7 +8,7 @@ export interface QuestionAgentDTO {
 }
 
 export const QuestionAgent = z.object({
-	type: z.string().refine((val) => ["task", "answer"].includes(val)),
+	type: z.string().refine((val) => ["QUERY", "TASK"].includes(val)),
 	content: z.string(),
 	missing: z.array(z.string())
 });
