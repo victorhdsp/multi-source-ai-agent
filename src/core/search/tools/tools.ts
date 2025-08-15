@@ -58,7 +58,7 @@ export class SearchAgentTools {
                 "Tenho permissão para fazer isso? (y/n)"
             )
 
-            const isPermitted = true//this.talkToHuman(prompt);
+            const isPermitted = this.talkToHuman(prompt);
 
             if (!isPermitted) {
                 return {
@@ -74,12 +74,14 @@ export class SearchAgentTools {
         const params = docPageTool.schema.parse(rawStateContent);
 
         try {
+            logger.thinking(`Buscando página: ${params.url}`);
             newItemToHistory = await this.getPageTool.invoke({ url: params.url });
         } catch (error) {
             logger.error("Error occurred while fetching page:", error);
             newItemToHistory = `Não consegui acessar a página ${params.url}`;
         }
 
+        logger.thinking(`Página acessada: ${params.url}`);
         return {
             ...state,
             history: [...state.history, newItemToHistory],

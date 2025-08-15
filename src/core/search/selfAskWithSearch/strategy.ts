@@ -35,7 +35,7 @@ export class SelfAskWithSearchStrategy {
         { role: "user", content: "Caso olhando para as ferramentas disponíveis você ache que não vai conseguir obter a resposta, então retorne um erro, mas jamais responda sem ter uma informação precisa disponível." },
         { role: "user", content: "O histórico atual de informações é: {history}" },
         { role: "user", content: "Você vai receber uma lista de informações faltantes que devem ser importantes para resolver o problema, você pode adicionar novas informações que você julgar necessário, você tambem pode remover, porém apenas se no histórico tiver a informação que responda essa pergutna." },
-        { role: "user", content: "Esse é um schema feito no Zod que representa o formato da resposta, ela sempre deve seguir esse schema: {format_instructions}, dentro do schema tem `type` que não deve ser modficado, `step` é usado para que o cliente tenha noção do passo atual, porém eles tem valores específicos que são: {steps}, caso você consiga responder a pergunta utilize o step de erro e caso esteja resolvido mesmo que ainda tenha perguntas use o step de STOP." },
+        { role: "user", content: "Esse é um schema feito no Zod que representa o formato da resposta, ela sempre deve seguir esse schema: {format_instructions}, dentro do schema tem `type` que não deve ser modficado, `step` é usado para que o cliente tenha noção do passo atual, porém eles tem valores específicos que são: {steps}, caso você consiga responder a pergunta utilize o step de WHATNOT e caso esteja resolvido mesmo que ainda tenha perguntas use o step de STOP." },
         { role: "user", content: "O problema do usuário é: {problem}" },
         { role: "user", content: "As informações faltantes são: {missing}" },
     ]
@@ -97,6 +97,8 @@ export class SelfAskWithSearchStrategy {
             rawParsedOutput.type = state.llMOutput.type;
             const output = selfAskState.parse(rawParsedOutput);
             
+            logger.thinking(output.content);
+
             return {
                 ...state,
                 llMOutput: output as SelfAskDTO,
@@ -108,14 +110,27 @@ export class SelfAskWithSearchStrategy {
     }
 
     async route(state: SearchAgentDTO): Promise<string> {
-        if (state.error || state.numberOfSteps > 5) {
+        if (state.error) {
+            logger.error(state.error);
             return SEARCH_AGENT_STEPS.STOP;
         }
-        
+
+        if (state.numberOfSteps > 5) {
+            logger.warn(`Limite de ${state.numberOfSteps} tentativas atingido`);
+            return SEARCH_AGENT_STEPS.STOP;
+        }
+
         if (state.llMOutput.missing.length === 0) {
+            logger.thinking("Já sei a resposta!");
             return SEARCH_AGENT_STEPS.STOP;
         }
+
+        if (state.llMOutput.step === SEARCH_AGENT_STEPS.WHATNOT) {
+            logger.thinking("Não consegui responder a pergunta.");
+            return SEARCH_AGENT_STEPS.WHATNOT;
+        }
         
+        logger.thinking(`Vou tentar ${state.llMOutput.step} para obter mais informações.`);
         return state.llMOutput.step;
     }
 }

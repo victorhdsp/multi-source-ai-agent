@@ -1,43 +1,34 @@
 import readline from "readline";
 import { callToMultiAgentUseCase, dependencies } from "./dependences";
 import { logger } from "./tools/logger";
+import { rlBus, rlPrompt, rlWrite, startReadline } from "./tools/readline";
 
 async function main() {
-    logger.info("Agent Service is running...");
-    
-    const rl = readline.createInterface({
-        input: process.stdin,
-        output: process.stdout,
-        prompt: "Pergunta> "
-    });
+    let isProcessing = false;
 
-    rl.prompt();
+    startReadline();
+    rlPrompt();
 
-    rl.on("line", async (line) => {
-        const question = line.trim();
-        if (!question) {
-            rl.prompt();
+    rlBus.on("input", async (question) => {
+        if (isProcessing) {
+            logger.warn("Já estou processando uma pergunta, aguarde...");
             return;
         }
 
-        if (question.toLowerCase() === "exit" || question.toLowerCase() === "sair") {
-            logger.info("Encerrando...");
-            rl.close();
-            return;
-        }
-
+        isProcessing = true;
         try {
             const response = await callToMultiAgentUseCase.execute(question);
-            logger.info("Resposta:", response);
+            logger.log("Resposta:", response);
+
         } catch (err) {
             logger.error("Erro:", err);
+        } finally {
+            isProcessing = false;
+            rlPrompt();
         }
-
-        rl.prompt();
-    }).on("close", () => {
-        process.exit(0);
     });
 }
+
 
 dependencies.init()
     .then(() => {

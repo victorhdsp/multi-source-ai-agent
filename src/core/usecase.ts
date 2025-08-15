@@ -20,7 +20,7 @@ export class MultiAgentUseCase {
     ) {}
 
     private executeGraph (prompt: string) {
-        logger.thinking("Pensando...")
+        logger.talk("Pensando...")
         const workflow = new StateGraph<MultiAgentState>(multiAgentState)
             .addNode("questionNode", this.questionUsecase.boundCallNode, {
                 retryPolicy: this.questionUsecase.boundErrorPolicy,
@@ -42,13 +42,12 @@ export class MultiAgentUseCase {
             // });
 
         workflow.addEdge(START, "questionNode");
-        workflow.addEdge("questionNode", "searchNode");
 
-        // workflow.addConditionalEdges("questionNode", this.questionUsecase.route as any, {
-        //     [MULTI_AGENT_STEPS.ERROR]: "errorNode",
-        //     [MULTI_AGENT_STEPS.SEARCH]: "researchNode",
-        //     [MULTI_AGENT_STEPS.EXECUTE]: "checkResultNode"
-        // });
+        workflow.addConditionalEdges("questionNode", this.questionUsecase.route as any, {
+            [MULTI_AGENT_STEPS.ERROR]: END, //"errorNode",
+            [MULTI_AGENT_STEPS.SEARCH]: "searchNode", //"researchNode",
+            [MULTI_AGENT_STEPS.EXECUTE]: END, //"checkResultNode"
+        });
 
         // workflow.addConditionalEdges("searchNode", this.searchUsecase.route as any, {
         //     [MULTI_AGENT_STEPS.ERROR]: "errorNode",

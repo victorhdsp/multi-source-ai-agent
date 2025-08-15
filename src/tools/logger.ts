@@ -20,7 +20,9 @@ export const logger = {
         console.debug(`[${timestamp}] DEBUG: ${message}`, ...optionalParams);
     },
     thinking: (message?: any, ...optionalParams: any[]) => {
-        const timestamp = new Date().toISOString();
         console.log(`   - Pensando: ${message}`, ...optionalParams);
+    },
+    talk: (message?: any, ...optionalParams: any[]) => {
+        console.log(message, ...optionalParams);
     }
 }
