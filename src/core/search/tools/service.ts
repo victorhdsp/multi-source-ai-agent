@@ -1,11 +1,10 @@
 
 import { interrupt } from "@langchain/langgraph";
 import { ERROR_MESSAGE, HUMAN_REQUEST, HUMAN_RESPONSE } from "@/src/config";
-import { findDBMusicTool } from "./musicDB/getMusicDB.tool";
 import type { SearchAgentDTO } from "../selfAskWithSearch/types/dto";
 import type { ITool, resolveToolType } from "./type";
-import type { DynamicStructuredTool, DynamicTool } from "@langchain/core/tools";
 import { docPageTool } from "./getPage/doc";
+import { docFindDBMusicTool } from "./musicDB/doc";
 
 export class SearchAgentTools {
     searchAgentTools: resolveToolType[] = [];
@@ -14,10 +13,10 @@ export class SearchAgentTools {
 
     constructor(
         getPageTool: ITool,
-        findDBMusicTool: DynamicStructuredTool | DynamicTool
+        findDBMusicTool: ITool
     ){
         this.getPageTool = getPageTool.invoke();
-        this.findDBMusicTool = findDBMusicTool;
+        this.findDBMusicTool = findDBMusicTool.invoke();
 
         this.searchAgentTools.push(this.getPageTool);
         this.searchAgentTools.push(this.findDBMusicTool);
@@ -70,9 +69,9 @@ export class SearchAgentTools {
 
     async getMusicDB (state: SearchAgentDTO): Promise<SearchAgentDTO> {
         const rawStateContent = JSON.parse(state.llMOutput.content);
-        const { table, columns, filters } = findDBMusicTool.schema.parse(rawStateContent);
+        const { table, columns, filters } = docFindDBMusicTool.schema.parse(rawStateContent);
 
-        const response = await findDBMusicTool.invoke({ table, columns, filters });
+        const response = await this.findDBMusicTool.invoke({ table, columns, filters });
         const resultContent = response.join("\n");
 
         return {

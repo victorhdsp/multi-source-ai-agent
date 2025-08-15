@@ -17,14 +17,14 @@ export class SearchAgentUsecase implements IGenericAgentUsecase{
     async callNode(state: MultiAgentDTO): Promise<MultiAgentDTO> {
         
         const workflow = new StateGraph<SearchAgentState>(searchAgentState)
-            .addNode("agentNode", this.strategyService.agent)
+            .addNode("agentNode", this.strategyService.callNode)
             .addNode("decisionNode", (state) => state)
             .addNode("getPageNode", this.toolService.getPage)
             .addNode("getMusicDbNode", this.toolService.getMusicDB);
 
         workflow.addEdge(START, "agentNode");
         workflow.addEdge("agentNode", "decisionNode");
-        workflow.addConditionalEdges("decisionNode", this.strategyService.decide as any, {
+        workflow.addConditionalEdges("decisionNode", this.strategyService.route as any, {
             [SEARCH_AGENT_STEPS.STOP]: END,
             [SEARCH_AGENT_STEPS.ANALYZE]: "agentNode",
             [SEARCH_AGENT_STEPS.GET_PAGE]: "getPageNode",
