@@ -1,7 +1,7 @@
 import { SQL_DATABASE_PATH } from "@/src/config";
 import { tool } from "@langchain/core/tools";
 import z from "zod";
-import Database from "better-sqlite3";
+import Database from "bun:sqlite";
 import fs from "fs";
 import { databaseMetadataSchema } from '../../models/databaseMetadata';
 

@@ -1,8 +1,8 @@
 import { interrupt } from "@langchain/langgraph";
-import type { SearchAgentDTO } from "../strategy/strategy";
 import { getPageTool } from "./getPage.tool";
 import { ERROR_MESSAGE, HUMAN_REQUEST, HUMAN_RESPONSE } from "@/src/config";
 import { findDBMusicTool } from "./getMusicDB.tool";
+import type { SearchAgentDTO } from "../selfAskWithSearch/types/dto";
 
 export const searchAgentTools = [getPageTool, findDBMusicTool];
 
