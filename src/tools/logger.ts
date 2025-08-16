@@ -28,6 +28,7 @@ export const logger = {
     },
     thinking: (message?: any, ...optionalParams: any[]) => {
         LogInFile(message, ' - THINKING:\n ');
+        if (!message) return;
         console.log(chalk.italic.cyan(`   - Pensando: ${message}`), ...optionalParams);
     },
     state: (message?: any, ...optionalParams: any[]) => {

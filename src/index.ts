@@ -1,4 +1,4 @@
-import { randomUUIDv7 } from "bun";
+import { randomUUIDv7, sleep } from "bun";
 import { SYSTEM_DATA } from "./config";
 import { callToMultiAgentUseCase, dependencies } from "./dependences";
 import { logger } from "./tools/logger";
@@ -20,6 +20,7 @@ async function main() {
         try {
             const response = await callToMultiAgentUseCase.execute(question);
             logger.talk("Response:", response);
+            await sleep(100); 
 
         } catch (err) {
             logger.error("Erro:", err);
