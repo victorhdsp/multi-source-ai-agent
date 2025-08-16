@@ -1,7 +1,6 @@
-import readline from "readline";
 import { callToMultiAgentUseCase, dependencies } from "./dependences";
 import { logger } from "./tools/logger";
-import { rlBus, rlPrompt, rlWrite, startReadline } from "./tools/readline";
+import { rlBus, rlPrompt, startReadline } from "./tools/readline";
 
 async function main() {
     let isProcessing = false;

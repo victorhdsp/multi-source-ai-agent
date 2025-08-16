@@ -1,19 +1,16 @@
 import { TaskType } from "@google/generative-ai";
-import { ExecuteAgentUsecase } from "./core/execute/usecase";
-import { CheckResultInterferenceUsecase } from "./core/interference/checkResult.usecase";
-import { ResearchInterferenceUsecase } from "./core/interference/research.usecase";
-import { QuestionAgentStrategy } from "./core/question/strategy";
-import { QuestionAgentUsecase } from "./core/question/usecase";
-import { SelfAskWithSearchStrategy } from "./core/search/selfAskWithSearch/strategy";
-import { docPageTool } from "./core/search/tools/getPage/doc";
-import { GetPageService } from "./core/search/tools/getPage/getPageService";
-import { GetPageTool } from "./core/search/tools/getPage/tool";
-import { docFindDBMusicTool } from "./core/search/tools/musicDB/doc";
-import { FindMusicDBService } from "./core/search/tools/musicDB/findMusicDBService";
-import { FindMusicDBTool } from "./core/search/tools/musicDB/tool";
-import { SearchAgentTools } from "./core/search/tools/tools";
-import { SearchAgentUsecase } from "./core/search/usecase";
-import { MultiAgentUseCase } from "./core/usecase";
+import { QuestionAgentStrategy } from "./domain/question/strategy";
+import { QuestionAgentUsecase } from "./domain/question/usecase";
+import { SelfAskWithSearchStrategy } from "@/src/domain/search/selfAskWithSearch/strategy";
+import { docPageTool } from "@/src/domain/search/tools/getPage/doc";
+import { GetPageService } from "@/src/domain/search/tools/getPage/getPageService";
+import { GetPageTool } from "@/src/domain/search/tools/getPage/tool";
+import { docFindDBMusicTool } from "@/src/domain/search/tools/musicDB/doc";
+import { FindMusicDBService } from "@/src/domain/search/tools/musicDB/findMusicDBService";
+import { FindMusicDBTool } from "@/src/domain/search/tools/musicDB/tool";
+import { SearchAgentTools } from "@/src/domain/search/tools/tools";
+import { SearchAgentUsecase } from "@/src/domain/search/usecase";
+import { MultiAgentUseCase } from "./domain/core/usecase";
 import { AgentLLMService } from "./infra/gateway/agentLlm.service";
 import { VectorStore } from "./infra/repository/vector.repository";
 import { GoogleGenerativeAIEmbeddings } from "@langchain/google-genai";
@@ -72,16 +69,10 @@ class Dependencies {
       strategySearchAgent,
       toolSearchAgent
     ),
-    executeUsecase = new ExecuteAgentUsecase(),
-    researchUsecase = new ResearchInterferenceUsecase(),
-    checkUsecase = new CheckResultInterferenceUsecase(),
 
     public callToMultiAgentUseCase = new MultiAgentUseCase(
       questionUsecase,
-      searchUsecase,
-      executeUsecase,
-      researchUsecase,
-      checkUsecase
+      searchUsecase
     )
   ){}
 
