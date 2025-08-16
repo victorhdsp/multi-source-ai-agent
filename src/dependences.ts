@@ -17,14 +17,19 @@ import { GoogleGenerativeAIEmbeddings } from "@langchain/google-genai";
 import Database from 'bun:sqlite';
 import { EMBEDDING_MODEL, SQL_DATABASE_PATH, VECTOR_DATABASE_PATH } from "./config";
 import { SearchAgentWorkflowManager } from './domain/search/workflow/manager';
+import { EmbeddingService } from "./infra/gateway/embedding.service";
 
 class Dependencies {
   constructor (
-    embedding = new GoogleGenerativeAIEmbeddings({
+    embeddingModel = new GoogleGenerativeAIEmbeddings({
       model: EMBEDDING_MODEL,
       taskType: TaskType.RETRIEVAL_DOCUMENT,
       title: "Document title",
     }),
+
+    embeddingService = new EmbeddingService(
+      embeddingModel
+    ),
 
     db = new Database(`${SQL_DATABASE_PATH}/music.db`),
 
@@ -34,17 +39,19 @@ class Dependencies {
     ),
 
     private vectorStore = new VectorStore(
-      embedding
+      embeddingModel
     ),
     model = new AgentLLMService(),
     
     getPageTool = new GetPageTool(
       docPageTool,
-      getPageService
+      getPageService,
+      embeddingService
     ),
     findMusicDBTool = new FindMusicDBTool(
       docFindDBMusicTool,
-      findMusicDBService
+      findMusicDBService,
+      embeddingService
     ),
 
     strategyQuestionAgent = new QuestionAgentStrategy(
@@ -68,8 +75,6 @@ class Dependencies {
       strategyQuestionAgent
     ),
     searchUsecase = new SearchAgentUsecase(
-      strategySearchAgent,
-      toolSearchAgent,
       searchAgentWorkflowManager
     ),
 

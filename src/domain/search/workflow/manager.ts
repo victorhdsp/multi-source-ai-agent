@@ -6,6 +6,7 @@ import type { SearchAgentTools } from "../tools/tools";
 import type { SearchAgentDTO } from "../selfAskWithSearch/types/dto";
 import { INTERRUPT_TYPES, type InterruptDTO } from '../../core/types/human';
 import { rlPrompt, waitForUserInput } from '@/src/tools/readline';
+import { logger } from '@/src/tools/logger';
 
 export class SearchAgentWorkflowManager {
     public readonly agent;
@@ -55,12 +56,14 @@ export class SearchAgentWorkflowManager {
     }
 
     public async runWorkflow(initialState: SearchAgentDTO): Promise<SearchAgentDTO> {
-        const result = await this.agent.invoke({
-            ...initialState,
-        }, { configurable: this.configurable });
+        const streams = await this.agent.stream(initialState, { configurable: this.configurable });
 
-        await this.interruptWorkflow((result as any).__interrupt__);
-
-        return result as SearchAgentDTO;
+        for await (const stream of streams) {
+            await this.interruptWorkflow((stream as any).__interrupt__);
+            logger.state(stream);
+        }
+        
+        const streamState = await this.agent.getState({ configurable: this.configurable });
+        return streamState.values as SearchAgentDTO;
     }
 }
