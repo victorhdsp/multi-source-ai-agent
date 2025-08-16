@@ -1,4 +1,3 @@
-import { ERROR_MESSAGE } from "@/src/config";
 import { persistentTalk } from "../../core/interference/helper/persistentTalk";
 import { HUMAN_RESPONSE, INTERRUPT_TYPES } from "../../core/types/human";
 import type { SearchAgentDTO } from "../selfAskWithSearch/types/dto";

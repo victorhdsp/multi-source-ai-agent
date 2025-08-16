@@ -1,3 +1,5 @@
+import fs from "fs";
+import path from "path";
 import type { EmbeddingService } from "@/src/infra/gateway/embedding.service";
 import type { IDocumentTool, ITool } from "../type";
 import { useSQLiteConsume, type UseSQLiteConsume } from "./type";
@@ -7,8 +9,6 @@ import type { FindDBService } from "./findDBService";
 import { ERROR_MESSAGE, SQL_METADATA_PATH } from "@/src/config";
 import { SEARCH_AGENT_STEPS } from "../../selfAskWithSearch/types/steps";
 import { databaseMetadataSchema } from "@/src/domain/core/types/databaseMetadata";
-import fs from "fs";
-import path from "path";
 import type { SearchAgentDTO } from "../../selfAskWithSearch/types/dto";
 
 interface UseSqliteTraitment {

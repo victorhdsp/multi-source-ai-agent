@@ -8,7 +8,7 @@ import { MultiAgentUseCase } from "./domain/core/usecase";
 import { AgentLLMService } from "./infra/gateway/agentLlm.service";
 import { VectorStore } from "./infra/repository/vector.repository";
 import { GoogleGenerativeAIEmbeddings } from "@langchain/google-genai";
-import { SearchAgentWorkflowManager } from './domain/search/workflow/manager';
+import { SearchAgentWorkflowManager } from './domain/search/workflowManager';
 import { EmbeddingService } from "./infra/gateway/embedding.service";
 import Database from 'bun:sqlite';
 import { DBMetadataService } from "./tools/metadataSQLDatabase";

@@ -2,7 +2,7 @@ import type { RetryPolicy } from '@langchain/langgraph';
 import { MULTI_AGENT_STEPS } from "@/src/domain/core/types/steps";
 import type { MultiAgentDTO } from "@/src/domain/core/types/dto";
 import type { SearchAgentDTO } from "@/src/domain/search/selfAskWithSearch/types/dto";
-import type { SearchAgentWorkflowManager } from './workflow/manager';
+import type { SearchAgentWorkflowManager } from './workflowManager';
 
 export class SearchAgentUsecase {
     public readonly boundCallNode;

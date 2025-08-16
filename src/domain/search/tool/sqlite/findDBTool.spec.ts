@@ -1,5 +1,4 @@
 import { describe, test, expect } from "bun:test";
-import { Database } from "bun:sqlite";
 import { FindDBService } from "./findDBService"
 import { SQL_DATABASE_PATH } from "@/src/config";
 import { FakeEmbeddings } from "langchain/embeddings/fake";
@@ -8,7 +7,6 @@ import { UseSQLiteTool } from "./useSQLite";
 
 
 describe("FindMusicDBService.selectFromDatabase", async () => {
-    const db = new Database(`${SQL_DATABASE_PATH}/music.db`);
     const embedding = new FakeEmbeddings();
     const embeddingService = new EmbeddingService(embedding);
 
@@ -23,7 +21,8 @@ describe("FindMusicDBService.selectFromDatabase", async () => {
             columns: ["Title", "ArtistId"]
         };
 
-        const expected = "Consulta ao banco de dados: music.db\nTabelas: Album\nFiltros: ArtistId = '1'\nColunas: Title, ArtistId\nResultado:\n  - \"Title\": \"For Those About To Rock We Salute You\", \"ArtistId\": \"1\"\n  - \"Title\": \"Let There Be Rock\", \"ArtistId\": \"1\"";
+        const expected = "Consulta ao banco de dados: \n\t/home/victor/projetos/cases/skip/data/sqlite/music.db\nTabelas: Album\nFiltros: ArtistId = '1'\nColunas: Title, ArtistId\nResultado:\n  - \"Title\": \"For Those About To Rock We Salute You\", \"ArtistId\": \"1\"\n  - \"Title\": \"Let There Be Rock\", \"ArtistId\": \"1\""
+;
 
         const response = await tool.execute(params);
 
@@ -39,7 +38,8 @@ describe("FindMusicDBService.selectFromDatabase", async () => {
             columns: ["Title", "ArtistId"]
         };
 
-        const expected = "Consulta ao banco de dados: music.db\nTabelas: Album\nFiltros: ArtistId = '999'\nColunas: Title, ArtistId\nResultado:\n"
+        const expected = "Consulta ao banco de dados: \n\t/home/victor/projetos/cases/skip/data/sqlite/music.db\nTabelas: Album\nFiltros: ArtistId = '999'\nColunas: Title, ArtistId\nResultado:\n"
+
 
         const response = await tool.execute(params);
 
@@ -55,7 +55,10 @@ describe("FindMusicDBService.selectFromDatabase", async () => {
             columns: ["Title", "ArtistId"]
         };
 
-        const response = tool.execute(params);
-        expect(response).rejects.toThrow("no such table: InvalidTable");
+        const expected = "Consulta ao banco de dados: \n\t/home/victor/projetos/cases/skip/data/sqlite/music.db\nTabelas: InvalidTable\nFiltros: ArtistId = '1'\nColunas: Title, ArtistId\nResultado:\n";
+        const response = await tool.execute(params);
+
+        expect(response).toBeDefined();
+        expect(response).toContain(expected);
     });
 });

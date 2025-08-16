@@ -1,12 +1,12 @@
 import { Command, END, MemorySaver, START, StateGraph, interrupt, type PregelOptions } from '@langchain/langgraph';
-import { searchAgentState, type SearchAgentState } from "../selfAskWithSearch/types";
-import { SEARCH_AGENT_STEPS } from "../selfAskWithSearch/types/steps";
-import type { SelfAskWithSearchStrategy } from "../selfAskWithSearch/strategy";
-import type { SearchAgentDTO } from "../selfAskWithSearch/types/dto";
-import { INTERRUPT_TYPES, type InterruptDTO } from '../../core/types/human';
+import { searchAgentState, type SearchAgentState } from "./selfAskWithSearch/types";
+import { SEARCH_AGENT_STEPS } from "./selfAskWithSearch/types/steps";
+import type { SelfAskWithSearchStrategy } from "./selfAskWithSearch/strategy";
+import type { SearchAgentDTO } from "./selfAskWithSearch/types/dto";
+import { INTERRUPT_TYPES, type InterruptDTO } from '../core/types/human';
 import { rlPrompt, waitForUserInput } from '@/src/tools/readline';
 import { logger } from '@/src/tools/logger';
-import type { ToolBoxService } from '../tool/service';
+import type { ToolBoxService } from './tool/service';
 
 export class SearchAgentWorkflowManager {
     public readonly agent;

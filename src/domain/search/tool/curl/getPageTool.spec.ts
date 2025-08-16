@@ -1,12 +1,16 @@
 import { describe, expect, test } from "bun:test"
 
 import { GetPageService } from "./getPageService";
-import { GetPageTool } from "./tool";
-import { docPageTool } from "./doc";
+import { UseCurlTool } from "./useCurl";
+import { FakeEmbeddings } from "langchain/embeddings/fake";
+import { EmbeddingService } from "@/src/infra/gateway/embedding.service";
 
 describe("GetPageService.getPage", () => {
+    const embedding = new FakeEmbeddings();
+    const embeddingService = new EmbeddingService(embedding);
     const service = new GetPageService();
-    const tool = new GetPageTool(docPageTool, service);
+
+    const tool = new UseCurlTool(service, embeddingService);
 
     test("should return page content", async () => {
         const url = "https://www.example.com";
@@ -20,8 +24,13 @@ describe("GetPageService.getPage", () => {
     });
 
     test("should throw error for invalid URL", async () => {
-        const invalidUrl = "invalid-url";
+        const url = "invalid-url";
 
-        await expect(tool.execute({url: invalidUrl})).rejects.toThrow("Invalid URL");
+        const response = await tool.execute({url});
+
+        expect(response).toBeDefined();
+        expect(typeof response).toBe("string");
+        expect(response).toBe("Não consegui acessar a página invalid-url.");
+        expect(response.length).toBeGreaterThan(0);
     });
 });
