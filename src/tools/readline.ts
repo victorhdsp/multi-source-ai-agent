@@ -5,7 +5,7 @@ import { logger } from "./logger";
 export const rlBus = new EventEmitter();
 
 let rl: readline.Interface | null = null;
-const PROMPT = "User= ";
+const PROMPT = "\nUser= ";
 
 export function startReadline() {
   if (rl) return rl;

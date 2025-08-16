@@ -13,8 +13,8 @@ export class MultiAgentUseCase {
         private readonly searchUsecase: SearchAgentUsecase,
     ) {}
 
-    private executeGraph (prompt: string) {
-        logger.talk("Pensando...")
+    private executeGraph () {
+        logger.thinking("...")
         const workflow = new StateGraph<MultiAgentState>(multiAgentState)
             .addNode("questionNode", this.questionUsecase.boundCallNode, {
                 retryPolicy: this.questionUsecase.boundErrorPolicy,
@@ -35,7 +35,7 @@ export class MultiAgentUseCase {
     }
 
     async execute(prompt: string): Promise<string> {
-        const workflow = this.executeGraph(prompt);
+        const workflow = this.executeGraph();
         const agent = workflow.compile();
         const result = await agent.invoke({ 
             input: prompt
