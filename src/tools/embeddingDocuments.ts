@@ -1,4 +1,3 @@
-import env from 'dotenv';
 import fs from 'fs';
 import path from 'path';
 
@@ -11,8 +10,6 @@ import { PDFLoader } from '@langchain/community/document_loaders/fs/pdf';
 import { VECTOR_DATABASE_PATH } from '../config';
 import { RecursiveCharacterTextSplitter } from 'langchain/text_splitter';
 import { logger } from './logger';
-
-env.config();
 
 const DOCUMENT_PATH = path.join(__dirname, '../../data/documents/');
 const PERMITTED_EXTENSIONS = new Set(['.txt', '.md', '.pdf']);

@@ -1,7 +1,20 @@
 import path from 'path';
 
+export const SYSTEM_DATA = {
+    name: "multi-agent",
+    version: "0.1.0",
+    currentSeason: null as string | null,
+}
+
+export const EMBEDDING_MODEL =process.env.EMBEDDING_MODEL || "text-embedding-004";
+export const PRIMARY_MODEL = process.env.PRIMARY_MODEL || "gemini-2.0-flash-lite";
+export const SECONDARY_MODEL = process.env.SECONDARY_MODEL || "gemini-2.5-flash";
+export const GOOGLE_API_KEY = process.env.GOOGLE_API_KEY;
+
+
 export const SQL_DATABASE_PATH = path.join(__dirname, '../data/sqlite');
 export const VECTOR_DATABASE_PATH = path.join(__dirname, 'infra/database/vector');
+export const LOG_PATH = path.join(__dirname, '../logs');
 
 export const ERROR_TYPE = {
     PARSER: "ParserError",
@@ -18,4 +31,5 @@ export const ERROR_MESSAGE = {
         return `Entrada inválida. As opções válidas são: ${validInputs.join(', ')}.`;
     },
     FAIL_TO_PARSE: "Falha ao analisar a saída do modelo.",
+    NOT_SUPPORT_BIND_TOOLS: "Este modelo não suporta vinculação de ferramentas via bindTools, utilizando métodos manuais.",
 }

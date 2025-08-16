@@ -1,13 +1,10 @@
-import { ERROR_TYPE } from "@/src/config";
+import { ERROR_TYPE, GOOGLE_API_KEY, PRIMARY_MODEL, SECONDARY_MODEL } from "@/src/config";
 import { logger } from "@/src/tools/logger";
 import type { CallbackManagerForLLMRun } from "@langchain/core/callbacks/manager";
 import { BaseChatModel } from "@langchain/core/language_models/chat_models";
 import type { BaseMessage } from "@langchain/core/messages";
 import type { ChatResult } from "@langchain/core/outputs";
 import { ChatGoogleGenerativeAI } from "@langchain/google-genai";
-import dotenv from 'dotenv';
-
-dotenv.config();
 
 export class AgentLLMService extends BaseChatModel {
     private primaryLLM: BaseChatModel;
@@ -18,14 +15,14 @@ export class AgentLLMService extends BaseChatModel {
         super(baseParams);
 
         this.primaryLLM = new ChatGoogleGenerativeAI({
-            model: process.env.PRIMARY_MODEL || "gemini-2.0-flash-lite",
-            apiKey: process.env.GOOGLE_API_KEY,
+            model: PRIMARY_MODEL,
+            apiKey: GOOGLE_API_KEY,
             temperature: 0
         });
 
         this.secondaryLLM = new ChatGoogleGenerativeAI({
-            model: process.env.SECONDARY_MODEL || "gemini-2.5-flash",
-            apiKey: process.env.GOOGLE_API_KEY,
+            model: SECONDARY_MODEL,
+            apiKey: GOOGLE_API_KEY,
             temperature: 0
         });
     }

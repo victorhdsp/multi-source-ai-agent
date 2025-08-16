@@ -34,12 +34,16 @@ export class QuestionAgentUsecase {
     async callNode(state: MultiAgentDTO): Promise<MultiAgentDTO> {
         try {
             const output = await this.execute(state.input);
-            logger.thinking(output.content);
-            return {
+            const newState: MultiAgentDTO = {
                 ...state,
                 llMOutput: output,
                 searchedSources: [MULTI_AGENT_SOURCE_VARS.DOCUMENT]
-            };
+            }
+
+            logger.thinking(output.content);
+            logger.state(newState);
+
+            return newState;
         } catch (error: any) {
             throw Error(error.message || "An error occurred while processing the question.");
         }

@@ -15,16 +15,13 @@ import { AgentLLMService } from "./infra/gateway/agentLlm.service";
 import { VectorStore } from "./infra/repository/vector.repository";
 import { GoogleGenerativeAIEmbeddings } from "@langchain/google-genai";
 import Database from 'bun:sqlite';
-import { SQL_DATABASE_PATH, VECTOR_DATABASE_PATH } from "./config";
-import dotenv from 'dotenv';
+import { EMBEDDING_MODEL, SQL_DATABASE_PATH, VECTOR_DATABASE_PATH } from "./config";
 import { SearchAgentWorkflowManager } from './domain/search/workflow/manager';
-
-dotenv.config();
 
 class Dependencies {
   constructor (
     embedding = new GoogleGenerativeAIEmbeddings({
-      model: process.env.EMBEDDING_MODEL || "text-embedding-004",
+      model: EMBEDDING_MODEL,
       taskType: TaskType.RETRIEVAL_DOCUMENT,
       title: "Document title",
     }),

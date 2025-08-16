@@ -20,7 +20,7 @@ export class SelfAskWithSearchStrategy {
             this.model.bindTools(searchAgentTools);
             this.bindedTools = true;
         } else {
-            logger.error("Este modelo não suporta vinculação de ferramentas");
+            logger.error(ERROR_MESSAGE.NOT_SUPPORT_BIND_TOOLS);
         }
         this.boundCallNode = this.callNode.bind(this);
         this.boundRoute = this.route.bind(this);
@@ -38,13 +38,16 @@ export class SelfAskWithSearchStrategy {
             rawParsedOutput.type = state.llMOutput.type;
             const output = selfAskState.parse(rawParsedOutput);
             
-            logger.thinking(output.content);
-
-            return {
+            const newState: SearchAgentDTO = {
                 ...state,
                 llMOutput: output as SelfAskDTO,
                 numberOfSteps: state.numberOfSteps + 1
             };
+
+            logger.thinking(output.content);
+            logger.state(newState);
+
+            return newState;
         } catch (error) {
             throw new Error(ERROR_MESSAGE.FAIL_TO_PARSE)
         }

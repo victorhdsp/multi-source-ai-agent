@@ -1,3 +1,5 @@
+import { randomUUIDv7 } from "bun";
+import { SYSTEM_DATA } from "./config";
 import { callToMultiAgentUseCase, dependencies } from "./dependences";
 import { logger } from "./tools/logger";
 import { rlBus, rlPrompt, startReadline } from "./tools/readline";
@@ -32,6 +34,8 @@ async function main() {
 dependencies.init()
     .then(() => {
         logger.info("Dependencies initialized successfully.");
+        SYSTEM_DATA.currentSeason = randomUUIDv7();
+        logger.thinking(`Sessão iniciada: ${SYSTEM_DATA.currentSeason}`);
         main();
     })
     .catch((error) => {

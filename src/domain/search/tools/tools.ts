@@ -70,15 +70,17 @@ export class SearchAgentTools {
             newItemToHistory = `Não consegui acessar a página ${params.url}`;
         }
 
-        logger.thinking(`Página acessada: ${params.url}`);
-
-
-        return {
+        const newState: SearchAgentDTO = {
             ...state,
             history: [...state.history, newItemToHistory],
             searchedSources: [ ...state.searchedSources, params.url ],
             llMOutput: { ...state.llMOutput, step: "ANALYZE" },
         };
+
+        logger.thinking(`Página acessada: ${params.url}`);
+        logger.state(newState);
+
+        return newState;
     }
 
     async getMusicDB (state: SearchAgentDTO): Promise<SearchAgentDTO> {
@@ -88,13 +90,15 @@ export class SearchAgentTools {
         const response = await this.findDBMusicTool.invoke({ table, columns, filters });
         const resultContent = response.join("\n");
 
-        logger.thinking(`Buscando na tabela: ${table}.`);
-
-        return {
+        const newState: SearchAgentDTO = {
             ...state,
             history: [...state.history, resultContent],
             searchedSources: [ ...state.searchedSources, `music_db:${table}` ],
             llMOutput: { ...state.llMOutput, step: "ANALYZE" },
-        }
+        };
+        logger.thinking(`Buscando na tabela: ${table}.`);
+        logger.state(newState);
+
+        return newState;
     }
 }
