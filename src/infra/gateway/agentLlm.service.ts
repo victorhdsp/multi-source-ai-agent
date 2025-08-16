@@ -5,6 +5,9 @@ import { BaseChatModel } from "@langchain/core/language_models/chat_models";
 import type { BaseMessage } from "@langchain/core/messages";
 import type { ChatResult } from "@langchain/core/outputs";
 import { ChatGoogleGenerativeAI } from "@langchain/google-genai";
+import dotenv from 'dotenv';
+
+dotenv.config();
 
 export class AgentLLMService extends BaseChatModel {
     private primaryLLM: BaseChatModel;
@@ -15,12 +18,14 @@ export class AgentLLMService extends BaseChatModel {
         super(baseParams);
 
         this.primaryLLM = new ChatGoogleGenerativeAI({
-            model: "gemini-2.5-flash",
+            model: process.env.PRIMARY_MODEL || "gemini-1.5-flash",
+            apiKey: process.env.GOOGLE_API_KEY,
             temperature: 0
         });
 
         this.secondaryLLM = new ChatGoogleGenerativeAI({
-            model: "gemini-2.0-flash",
+            model: process.env.SECONDARY_MODEL || "gemini-1.5-pro",
+            apiKey: process.env.GOOGLE_API_KEY,
             temperature: 0
         });
     }
