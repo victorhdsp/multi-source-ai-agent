@@ -18,13 +18,13 @@ export class AgentLLMService extends BaseChatModel {
         super(baseParams);
 
         this.primaryLLM = new ChatGoogleGenerativeAI({
-            model: process.env.PRIMARY_MODEL || "gemini-1.5-flash",
+            model: process.env.PRIMARY_MODEL || "gemini-2.0-flash-lite",
             apiKey: process.env.GOOGLE_API_KEY,
             temperature: 0
         });
 
         this.secondaryLLM = new ChatGoogleGenerativeAI({
-            model: process.env.SECONDARY_MODEL || "gemini-1.5-pro",
+            model: process.env.SECONDARY_MODEL || "gemini-2.5-flash",
             apiKey: process.env.GOOGLE_API_KEY,
             temperature: 0
         });

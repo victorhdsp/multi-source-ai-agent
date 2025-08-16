@@ -60,8 +60,6 @@ export class VectorStore implements IVectorStore {
                 space: this.SPACE,
                 numDimensions: this.NUM_DIMENSIONS
             });
-
-            await this.save(path);
         }
     }
 

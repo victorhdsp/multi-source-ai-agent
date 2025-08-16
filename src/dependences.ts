@@ -17,6 +17,7 @@ import { GoogleGenerativeAIEmbeddings } from "@langchain/google-genai";
 import Database from 'bun:sqlite';
 import { SQL_DATABASE_PATH, VECTOR_DATABASE_PATH } from "./config";
 import dotenv from 'dotenv';
+import { SearchAgentWorkflowManager } from './domain/search/workflow/manager';
 
 dotenv.config();
 
@@ -60,6 +61,10 @@ class Dependencies {
       model,
       toolSearchAgent.searchAgentTools
     ),
+    searchAgentWorkflowManager = new SearchAgentWorkflowManager(
+      strategySearchAgent,
+      toolSearchAgent
+    ),
 
     questionUsecase = new QuestionAgentUsecase(
       vectorStore,
@@ -67,7 +72,8 @@ class Dependencies {
     ),
     searchUsecase = new SearchAgentUsecase(
       strategySearchAgent,
-      toolSearchAgent
+      toolSearchAgent,
+      searchAgentWorkflowManager
     ),
 
     public callToMultiAgentUseCase = new MultiAgentUseCase(

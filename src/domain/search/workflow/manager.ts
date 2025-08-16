@@ -59,7 +59,7 @@ export class SearchAgentWorkflowManager {
             ...initialState,
         }, { configurable: this.configurable });
 
-        this.interruptWorkflow((result as any).__interrupt__);
+        await this.interruptWorkflow((result as any).__interrupt__);
 
         return result as SearchAgentDTO;
     }

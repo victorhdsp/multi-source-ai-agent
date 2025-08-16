@@ -18,7 +18,7 @@ export class CheckResultInterferenceUsecase {
             "Você aprova a execução desse plano? (y/n)"
         )
 
-        const permission = persistentTalk(
+        const permission = await persistentTalk(
             prompt,
             INTERRUPT_TYPES.PERMISSION as InterruptType,
             [HUMAN_RESPONSE.TRUE, HUMAN_RESPONSE.FALSE]

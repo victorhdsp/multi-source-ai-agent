@@ -23,12 +23,11 @@ export class QuestionAgentUsecase {
     }
 
     private async execute(input: string): Promise<QuestionAgentDTO> {
-        const similarData = await this.vectorStore.similaritySearch(input, 5);
+        const similarData = await this.vectorStore.similaritySearch(input, 3);
         const context = similarData.map(data => data.pageContent).join('\n');
         const prompt = await this.questionAgentStrategy.formatQuestionPrompt(input, context);
         const rawResponse = await this.questionAgentStrategy.sendToModel(prompt);
         const output = await this.questionAgentStrategy.parseOutput(rawResponse);
-
         return output;
     }
 

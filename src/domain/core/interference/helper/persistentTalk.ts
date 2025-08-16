@@ -2,11 +2,11 @@ import { interrupt } from "@langchain/langgraph";
 import type { InterruptDTO, InterruptType } from "../../types/human";
 import { ERROR_MESSAGE } from "@/src/config";
 
-export function persistentTalk(
+export async function persistentTalk(
     prompt: string,
     type: InterruptType,
     validResponses: Set<string>[]
-): string {
+): Promise<string> {
     let message = prompt;
     const rawResponse = interrupt({
         type: type,
@@ -28,5 +28,6 @@ export function persistentTalk(
         }
 
         message = wrongMessage;
+        await new Promise((resolve) => setTimeout(resolve, 100));
     }
 }

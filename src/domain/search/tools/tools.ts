@@ -8,6 +8,7 @@ import type { FindMusicDBTool } from "@/src/domain/search/tools/musicDB/tool";
 import { logger } from "@/src/tools/logger";
 import { persistentTalk } from "../../core/interference/helper/persistentTalk";
 import { HUMAN_RESPONSE, INTERRUPT_TYPES, type InterruptType } from "../../core/types/human";
+import * as cheerio from "cheerio";
 
 export class SearchAgentTools {
     searchAgentTools: resolveToolType[] = [];
@@ -40,7 +41,7 @@ export class SearchAgentTools {
                 "Tenho permissão para fazer isso? (y/n)"
             )
 
-            const permission = persistentTalk(
+            const permission = await persistentTalk(
                 prompt,
                 INTERRUPT_TYPES.PERMISSION as InterruptType,
                 [HUMAN_RESPONSE.TRUE, HUMAN_RESPONSE.FALSE]
@@ -60,13 +61,17 @@ export class SearchAgentTools {
 
         try {
             logger.thinking(`Buscando página: ${params.url}`);
-            newItemToHistory = await this.getPageTool.invoke({ url: params.url });
+            const bruteHTML = await this.getPageTool.invoke({ url: params.url });
+            const $ = cheerio.load(bruteHTML);
+            // ADD SIMILAR TO docPageTool -- Embedding
+            newItemToHistory = $("body").text().replace(/\s+/g, ' ').trim()
         } catch (error) {
             logger.error("Error occurred while fetching page:", error);
             newItemToHistory = `Não consegui acessar a página ${params.url}`;
         }
 
         logger.thinking(`Página acessada: ${params.url}`);
+
 
         return {
             ...state,

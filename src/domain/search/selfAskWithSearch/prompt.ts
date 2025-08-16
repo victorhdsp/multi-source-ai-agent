@@ -1,4 +1,10 @@
-import type { BaseMessagePromptTemplateLike } from "@langchain/core/prompts";
+import { ChatPromptTemplate, type BaseMessagePromptTemplateLike } from "@langchain/core/prompts";
+import type { SearchAgentDTO } from "./types/dto";
+import { AnswerTypeStrategy } from "../../core/types/answerType";
+import { SEARCH_AGENT_STEPS } from "./types/steps";
+import { toJsonSchema } from "@langchain/core/utils/json_schema";
+import { selfAskState } from "./types";
+import type { resolveToolType } from "../tools/type";
 
 export const agentSearchPrompt: BaseMessagePromptTemplateLike[] = [
     { role: "system", content: "Você faz parte de um time de agentes que tem como objetivo resolver o problema enviado pelo cliente, antes do problema chegar em você ele já passou pelo 'assistente' que fez uma análise inicial, classificou o tipo do problema como {problem_type} e começou a decompor o problema em partes menores." },
@@ -11,3 +17,49 @@ export const agentSearchPrompt: BaseMessagePromptTemplateLike[] = [
     { role: "user", content: "O problema do usuário é: {problem}" },
     { role: "user", content: "As informações faltantes são: {missing}" },
 ]
+
+export function useTools(bindedTools: boolean, searchAgentTools: resolveToolType[]): BaseMessagePromptTemplateLike[] {
+    if (bindedTools) {
+        return [];
+    }
+
+    const tools = searchAgentTools.map(tool => {
+        const schema = (toJsonSchema(tool.schema) as any).properties;
+        return `Nome da ferramenta: ${tool.name}, Descrição da ferramenta e como usar: ${tool.description}, Schema do input esperado pela ferramenta: ${schema}`;
+    }).join("\n");
+
+    const prompt: BaseMessagePromptTemplateLike[] = [
+        { role: "user", content: "Você tem as seguintes ferramentas disponíveis para utilizar: " },
+        { role: "user", content: tools },
+        { role: "user", content: "Para utilizar essas ferramentas, seguindo o schema, você deve marcar o step correspondente e o content deve ser uma string contendo o schema de parâmetros." }
+    ];
+    return prompt;
+}
+
+export async function formatAgentPrompt(state: SearchAgentDTO, tools: BaseMessagePromptTemplateLike[]): Promise<ChatPromptTemplate> {
+    const format = (toJsonSchema(selfAskState) as any).properties;
+
+    const problemType = Object.entries(AnswerTypeStrategy).map(([key, value]) => {
+        return `"${key}" - "${value}"`;
+    }).join(", ");
+
+    const history = state.history.join("\n");
+
+    const steps = Object.keys(SEARCH_AGENT_STEPS).join(", ");
+
+    const prompt = ChatPromptTemplate.fromMessages([
+        ...agentSearchPrompt,
+        ...tools
+    ])
+        .partial({
+            problem_type: problemType,
+            objective: AnswerTypeStrategy[state.llMOutput.type],
+            history: history,
+            format_instructions: `${JSON.stringify(format)}`,
+            steps: steps,
+            problem: state.userInput,
+            missing: state.llMOutput.missing.join(", "),
+        });
+
+    return prompt;
+}

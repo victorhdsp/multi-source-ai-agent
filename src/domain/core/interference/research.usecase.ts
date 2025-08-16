@@ -13,7 +13,7 @@ export class ResearchInterferenceUsecase {
             "Posso voltar para a pesquisa? (y/n)"
         )
 
-        const permission = persistentTalk(
+        const permission = await persistentTalk(
             prompt,
             INTERRUPT_TYPES.PERMISSION as InterruptType,
             [HUMAN_RESPONSE.TRUE, HUMAN_RESPONSE.FALSE]

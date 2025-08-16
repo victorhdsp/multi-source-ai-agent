@@ -1,28 +1,30 @@
+import chalk from "chalk";
+
 export const logger = {
     log: (message?: any, ...optionalParams: any[]) => {
         const timestamp = new Date().toISOString();
-        console.log(`[${timestamp}] ${message}`, ...optionalParams);
+        console.log(chalk.white(`[${timestamp}] ${message}`), ...optionalParams);
     },
     error: (message?: any, ...optionalParams: any[]) => {
         const timestamp = new Date().toISOString();
-        console.error(`[${timestamp}] ERROR: ${message}`, ...optionalParams);
+        console.error(chalk.red(`[${timestamp}] ERROR: ${message}`), ...optionalParams);
     },
     info: (message?: any, ...optionalParams: any[]) => {
         const timestamp = new Date().toISOString();
-        console.info(`[${timestamp}] INFO: ${message}`, ...optionalParams);
+        console.info(chalk.blue(`[${timestamp}] INFO: ${message}`), ...optionalParams);
     },
     warn: (message?: any, ...optionalParams: any[]) => {
         const timestamp = new Date().toISOString();
-        console.warn(`[${timestamp}] WARN: ${message}`, ...optionalParams);
+        console.warn(chalk.yellow(`[${timestamp}] WARN: ${message}`), ...optionalParams);
     },
     debug: (message?: any, ...optionalParams: any[]) => {
         const timestamp = new Date().toISOString();
-        console.debug(`[${timestamp}] DEBUG: ${message}`, ...optionalParams);
+        console.debug(chalk.gray(`[${timestamp}] DEBUG: ${message}`), ...optionalParams);
     },
     thinking: (message?: any, ...optionalParams: any[]) => {
-        console.log(`   - Pensando: ${message}`, ...optionalParams);
+        console.log(chalk.italic.cyan(`   - Pensando: ${message}`), ...optionalParams);
     },
     talk: (message?: any, ...optionalParams: any[]) => {
-        console.log(message, ...optionalParams);
+        console.log(chalk.white(message), ...optionalParams);
     }
 }

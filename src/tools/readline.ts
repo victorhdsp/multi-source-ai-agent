@@ -48,7 +48,7 @@ export function rlWrite(line: string) {
 }
 
 export function waitForUserInput(promptMessage: string): Promise<string> {
-  logger.talk(promptMessage);
+  logger.talk(`\n${promptMessage}`);
   rlPrompt();
 
   return new Promise((resolve) => {

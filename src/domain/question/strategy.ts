@@ -20,9 +20,9 @@ export class QuestionAgentStrategy {
             return `"${key}" - "${value}"`;
         });
         
-        const prompt = await ChatPromptTemplate.fromMessages(
-            agentQuestionPrompt
-        )
+        const prompt = await ChatPromptTemplate.fromMessages([
+            ...agentQuestionPrompt
+        ])
         .partial({
             problem_types: problemTypes.join(", "),
             context: content,

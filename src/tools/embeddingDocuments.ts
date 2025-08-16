@@ -16,8 +16,8 @@ env.config();
 
 const DOCUMENT_PATH = path.join(__dirname, '../../data/documents/');
 const PERMITTED_EXTENSIONS = new Set(['.txt', '.md', '.pdf']);
-const CHUNK_SIZE = 1000;
-const CHUNK_OVERLAP = 200;
+const CHUNK_SIZE = 500;
+const CHUNK_OVERLAP = 100;
 
 const embedding = new GoogleGenerativeAIEmbeddings({
   model: "text-embedding-004",
