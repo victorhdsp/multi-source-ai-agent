@@ -1,6 +1,4 @@
-
-import { interrupt } from "@langchain/langgraph";
-import { ERROR_MESSAGE, HUMAN_REQUEST, HUMAN_RESPONSE } from "@/src/config";
+import { ERROR_MESSAGE } from "@/src/config";
 import type { SearchAgentDTO } from "@/src/domain/search/selfAskWithSearch/types/dto";
 import type { resolveToolType } from "@/src/domain/search/tools/type";
 import { docPageTool } from "@/src/domain/search/tools/getPage/doc";
@@ -8,6 +6,8 @@ import { docFindDBMusicTool } from "@/src/domain/search/tools/musicDB/doc";
 import type { GetPageTool } from "@/src/domain/search/tools/getPage/tool";
 import type { FindMusicDBTool } from "@/src/domain/search/tools/musicDB/tool";
 import { logger } from "@/src/tools/logger";
+import { persistentTalk } from "../../core/interference/helper/persistentTalk";
+import { HUMAN_RESPONSE, INTERRUPT_TYPES, type InterruptType } from "../../core/types/human";
 
 export class SearchAgentTools {
     searchAgentTools: resolveToolType[] = [];
@@ -32,24 +32,6 @@ export class SearchAgentTools {
         this.boundFindDBMusic = this.getMusicDB.bind(this);
     }
 
-    private talkToHuman(prompt: string): boolean {
-        let question = prompt;
-        const rawResponse = interrupt({
-            type: HUMAN_REQUEST.PERMISSION,
-            question: question
-        });
-
-        while(true) {
-            const response = rawResponse.toLowerCase().trim();
-
-            if (HUMAN_RESPONSE.TRUE.has(response))
-                return true;
-            if (HUMAN_RESPONSE.FALSE.has(response))
-                return false;
-            question = ERROR_MESSAGE.WRONG_INPUT(["s", "n"]);
-        }
-    }
-
     async getPage (state: SearchAgentDTO): Promise<SearchAgentDTO> {
         if (!state.permissions.has("INTERNET")) {
             const prompt = (
@@ -58,9 +40,12 @@ export class SearchAgentTools {
                 "Tenho permissão para fazer isso? (y/n)"
             )
 
-            const isPermitted = this.talkToHuman(prompt);
-
-            if (!isPermitted) {
+            const permission = persistentTalk(
+                prompt,
+                INTERRUPT_TYPES.PERMISSION as InterruptType,
+                [HUMAN_RESPONSE.TRUE, HUMAN_RESPONSE.FALSE]
+            );
+            if (!HUMAN_RESPONSE.TRUE.has(permission)) {
                 return {
                     ...state,
                     error: ERROR_MESSAGE.NO_PERMISSION_TO_WEB_SEARCH,
@@ -82,6 +67,7 @@ export class SearchAgentTools {
         }
 
         logger.thinking(`Página acessada: ${params.url}`);
+
         return {
             ...state,
             history: [...state.history, newItemToHistory],
@@ -96,6 +82,8 @@ export class SearchAgentTools {
 
         const response = await this.findDBMusicTool.invoke({ table, columns, filters });
         const resultContent = response.join("\n");
+
+        logger.thinking(`Buscando na tabela: ${table}.`);
 
         return {
             ...state,

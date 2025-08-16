@@ -1,24 +1,11 @@
-import { Command, END, interrupt, type RetryPolicy } from "@langchain/langgraph";
-import { ERROR_MESSAGE, HUMAN_REQUEST, HUMAN_RESPONSE } from "@/src/config";
+
+import { Command, END, type RetryPolicy } from "@langchain/langgraph";
+import { ERROR_MESSAGE} from "@/src/config";
 import type { MultiAgentDTO } from "@/src/domain/core/types/dto";
+import { HUMAN_RESPONSE, INTERRUPT_TYPES, type InterruptType } from "../types/human";
+import { persistentTalk } from "./helper/persistentTalk";
 
 export class CheckResultInterferenceUsecase {
-    private talkToHuman(prompt: string): boolean {
-        const rawResponse = interrupt({
-            type: HUMAN_REQUEST.PERMISSION,
-            question: prompt
-        });
-        
-        const response = rawResponse.toLowerCase().trim();
-
-        if (HUMAN_RESPONSE.TRUE.has(response))
-            return true;
-        if (HUMAN_RESPONSE.FALSE.has(response))
-            return false;
-        
-        return this.talkToHuman(ERROR_MESSAGE.WRONG_INPUT(["s", "n"]));
-    }
-
     async callNode(state: MultiAgentDTO): Promise<MultiAgentDTO> {
         if (state.llMOutput.type === "QUERY")
             return new Command({ goto: END }) as any;
@@ -31,9 +18,13 @@ export class CheckResultInterferenceUsecase {
             "Você aprova a execução desse plano? (y/n)"
         )
 
-        const permission = this.talkToHuman(prompt);
+        const permission = persistentTalk(
+            prompt,
+            INTERRUPT_TYPES.PERMISSION as InterruptType,
+            [HUMAN_RESPONSE.TRUE, HUMAN_RESPONSE.FALSE]
+        );
 
-        if (permission) {
+        if (HUMAN_RESPONSE.TRUE.has(permission)) {
             return new Command({ goto: "executeNode" }) as any;
         }
 

@@ -19,12 +19,3 @@ export const ERROR_MESSAGE = {
     },
     FAIL_TO_PARSE: "Falha ao analisar a saída do modelo.",
 }
-
-export const HUMAN_REQUEST = {
-    PERMISSION: "getPermission"
-}
-
-export const HUMAN_RESPONSE = {
-    TRUE: new Set(["sim", "s", "yes", "y"]),
-    FALSE: new Set(["não", "n", "no"]),
-}

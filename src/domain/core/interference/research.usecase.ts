@@ -1,24 +1,10 @@
-import { Command, interrupt, type RetryPolicy } from "@langchain/langgraph";
-import { ERROR_MESSAGE, HUMAN_REQUEST, HUMAN_RESPONSE } from "@/src/config";
+import { Command, type RetryPolicy } from "@langchain/langgraph";
+import { ERROR_MESSAGE } from "@/src/config";
 import type { MultiAgentDTO } from "@/src/domain/core/types/dto";
+import { persistentTalk } from "./helper/persistentTalk";
+import { HUMAN_RESPONSE, INTERRUPT_TYPES, type InterruptType } from "../types/human";
 
 export class ResearchInterferenceUsecase {
-    private talkToHuman(prompt: string): boolean {
-        const rawResponse = interrupt({
-            type: HUMAN_REQUEST.PERMISSION,
-            question: prompt
-        });
-        
-        const response = rawResponse.toLowerCase().trim();
-
-        if (HUMAN_RESPONSE.TRUE.has(response))
-            return true;
-        if (HUMAN_RESPONSE.FALSE.has(response))
-            return false;
-        
-        return this.talkToHuman(ERROR_MESSAGE.WRONG_INPUT(["s", "n"]));
-    }
-
     async callNode(state: MultiAgentDTO): Promise<MultiAgentDTO> {
         const prompt = (
             "Você ainda não tem informações suficientes para continuar. \n" +
@@ -27,9 +13,13 @@ export class ResearchInterferenceUsecase {
             "Posso voltar para a pesquisa? (y/n)"
         )
 
-        const isPermitted = this.talkToHuman(prompt);
+        const permission = persistentTalk(
+            prompt,
+            INTERRUPT_TYPES.PERMISSION as InterruptType,
+            [HUMAN_RESPONSE.TRUE, HUMAN_RESPONSE.FALSE]
+        );
 
-        if (isPermitted) {
+        if (HUMAN_RESPONSE.TRUE.has(permission)) {
             return new Command({ goto: "searchNode" }) as any;
         }
 
