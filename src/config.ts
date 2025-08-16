@@ -1,4 +1,5 @@
 import path from 'path';
+import fs from 'fs';
 
 export const SYSTEM_DATA = {
     name: "multi-agent",
@@ -11,10 +12,21 @@ export const PRIMARY_MODEL = process.env.PRIMARY_MODEL || "gemini-2.0-flash-lite
 export const SECONDARY_MODEL = process.env.SECONDARY_MODEL || "gemini-2.5-flash";
 export const GOOGLE_API_KEY = process.env.GOOGLE_API_KEY;
 
-
+const resolvePath = (relativePath: string) => {
+    try {
+        fs.readdirSync(relativePath);
+    } catch {
+        fs.mkdirSync(relativePath, { recursive: true });
+    }
+}
 export const SQL_DATABASE_PATH = path.join(__dirname, '../data/sqlite');
+resolvePath(SQL_DATABASE_PATH);
+export const SQL_METADATA_PATH = path.join(__dirname, 'infra/database/sqlite');
+resolvePath(SQL_METADATA_PATH);
 export const VECTOR_DATABASE_PATH = path.join(__dirname, 'infra/database/vector');
+resolvePath(VECTOR_DATABASE_PATH);
 export const LOG_PATH = path.join(__dirname, '../logs');
+resolvePath(LOG_PATH);
 
 export const ERROR_TYPE = {
     PARSER: "ParserError",

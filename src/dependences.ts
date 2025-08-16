@@ -1,23 +1,22 @@
+import { EMBEDDING_MODEL, SQL_DATABASE_PATH, VECTOR_DATABASE_PATH } from "./config";
 import { TaskType } from "@google/generative-ai";
 import { QuestionAgentStrategy } from "./domain/question/strategy";
 import { QuestionAgentUsecase } from "./domain/question/usecase";
 import { SelfAskWithSearchStrategy } from "@/src/domain/search/selfAskWithSearch/strategy";
-import { docPageTool } from "@/src/domain/search/tools/getPage/doc";
-import { GetPageService } from "@/src/domain/search/tools/getPage/getPageService";
-import { GetPageTool } from "@/src/domain/search/tools/getPage/tool";
-import { docFindDBMusicTool } from "@/src/domain/search/tools/musicDB/doc";
-import { FindMusicDBService } from "@/src/domain/search/tools/musicDB/findMusicDBService";
-import { FindMusicDBTool } from "@/src/domain/search/tools/musicDB/tool";
-import { SearchAgentTools } from "@/src/domain/search/tools/tools";
 import { SearchAgentUsecase } from "@/src/domain/search/usecase";
 import { MultiAgentUseCase } from "./domain/core/usecase";
 import { AgentLLMService } from "./infra/gateway/agentLlm.service";
 import { VectorStore } from "./infra/repository/vector.repository";
 import { GoogleGenerativeAIEmbeddings } from "@langchain/google-genai";
-import Database from 'bun:sqlite';
-import { EMBEDDING_MODEL, SQL_DATABASE_PATH, VECTOR_DATABASE_PATH } from "./config";
 import { SearchAgentWorkflowManager } from './domain/search/workflow/manager';
 import { EmbeddingService } from "./infra/gateway/embedding.service";
+import Database from 'bun:sqlite';
+import { DBMetadataService } from "./tools/metadataSQLDatabase";
+import { ToolBoxService } from "./domain/search/tool/service";
+import { UseCurlTool } from "./domain/search/tool/curl/useCurl";
+import { UseSQLiteTool } from "./domain/search/tool/sqlite/useSQLite";
+import { GetPageService } from "./domain/search/tool/curl/getPageService";
+import { FindDBService } from "./domain/search/tool/sqlite/findDBService";
 
 class Dependencies {
   constructor (
@@ -31,43 +30,35 @@ class Dependencies {
       embeddingModel
     ),
 
-    db = new Database(`${SQL_DATABASE_PATH}/music.db`),
-
     getPageService = new GetPageService(),
-    findMusicDBService = new FindMusicDBService(
-      db
-    ),
-
+    findMusicDBService = new FindDBService(),
     private vectorStore = new VectorStore(
       embeddingModel
     ),
     model = new AgentLLMService(),
     
-    getPageTool = new GetPageTool(
-      docPageTool,
+    useCurlTool = new UseCurlTool(
       getPageService,
       embeddingService
     ),
-    findMusicDBTool = new FindMusicDBTool(
-      docFindDBMusicTool,
+    useSQLiteTool = new UseSQLiteTool(
       findMusicDBService,
       embeddingService
     ),
-
+    toolBoxService = new ToolBoxService(
+      useCurlTool,
+      useSQLiteTool
+    ),
     strategyQuestionAgent = new QuestionAgentStrategy(
       model
     ),
-    toolSearchAgent = new SearchAgentTools(
-      getPageTool,
-      findMusicDBTool
-    ),
     strategySearchAgent = new SelfAskWithSearchStrategy(
       model,
-      toolSearchAgent.searchAgentTools
+      toolBoxService
     ),
     searchAgentWorkflowManager = new SearchAgentWorkflowManager(
       strategySearchAgent,
-      toolSearchAgent
+      toolBoxService
     ),
 
     questionUsecase = new QuestionAgentUsecase(
@@ -81,7 +72,8 @@ class Dependencies {
     public callToMultiAgentUseCase = new MultiAgentUseCase(
       questionUsecase,
       searchUsecase
-    )
+    ),
+    public dbMetadataService = new DBMetadataService(model)
   ){}
 
   async init() {
@@ -89,6 +81,9 @@ class Dependencies {
   }
 }
 
-export const dependencies = new Dependencies();;
+export const dependencies = new Dependencies();
 
-export const { callToMultiAgentUseCase } = dependencies;
+export const { 
+  callToMultiAgentUseCase,
+  dbMetadataService
+} = dependencies;

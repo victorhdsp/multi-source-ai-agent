@@ -2,11 +2,11 @@ import { Command, END, MemorySaver, START, StateGraph, interrupt, type PregelOpt
 import { searchAgentState, type SearchAgentState } from "../selfAskWithSearch/types";
 import { SEARCH_AGENT_STEPS } from "../selfAskWithSearch/types/steps";
 import type { SelfAskWithSearchStrategy } from "../selfAskWithSearch/strategy";
-import type { SearchAgentTools } from "../tools/tools";
 import type { SearchAgentDTO } from "../selfAskWithSearch/types/dto";
 import { INTERRUPT_TYPES, type InterruptDTO } from '../../core/types/human';
 import { rlPrompt, waitForUserInput } from '@/src/tools/readline';
 import { logger } from '@/src/tools/logger';
+import type { ToolBoxService } from '../tool/service';
 
 export class SearchAgentWorkflowManager {
     public readonly agent;
@@ -14,7 +14,7 @@ export class SearchAgentWorkflowManager {
 
     constructor(
         private readonly strategyService: SelfAskWithSearchStrategy,
-        private readonly toolService: SearchAgentTools,
+        private readonly toolBox: ToolBoxService,
     ) {
         this.agent = this.instance();
     }
@@ -23,21 +23,21 @@ export class SearchAgentWorkflowManager {
         const workflow = new StateGraph<SearchAgentState>(searchAgentState)
         .addNode("agentNode", this.strategyService.boundCallNode)
         .addNode("decisionNode", s => s)
-        .addNode("getPageNode", this.toolService.boundGetPage)
-        .addNode("getMusicDbNode", this.toolService.boundFindDBMusic)
+        .addNode("useCurlNode", this.toolBox.useCUrl)
+        .addNode("useSQLiteNode", this.toolBox.useSQLite)
 
         workflow.addEdge(START, "agentNode");
         workflow.addEdge("agentNode", "decisionNode");
         workflow.addConditionalEdges("decisionNode", this.strategyService.boundRoute as any, {
             [SEARCH_AGENT_STEPS.STOP]: END,
             [SEARCH_AGENT_STEPS.ANALYZE]: "agentNode",
-            [SEARCH_AGENT_STEPS.GET_PAGE]: "getPageNode",
-            [SEARCH_AGENT_STEPS.GET_MUSIC_DB]: "getMusicDbNode",
+            [SEARCH_AGENT_STEPS.GET_PAGE]: "useCurlNode",
+            [SEARCH_AGENT_STEPS.GET_MUSIC_DB]: "useSQLiteNode",
             [SEARCH_AGENT_STEPS.WHATNOT]: END,
         });
-        workflow.addEdge("getPageNode", "decisionNode");
-        workflow.addEdge("getMusicDbNode", "decisionNode");
-        
+        workflow.addEdge("useCurlNode", "decisionNode");
+        workflow.addEdge("useSQLiteNode", "decisionNode");
+
         const checkpointer = new MemorySaver();
         return workflow.compile({ checkpointer });
     }

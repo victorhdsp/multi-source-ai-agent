@@ -1,6 +1,6 @@
 import { randomUUIDv7, sleep } from "bun";
 import { SYSTEM_DATA } from "./config";
-import { callToMultiAgentUseCase, dependencies } from "./dependences";
+import { callToMultiAgentUseCase, dbMetadataService, dependencies } from "./dependences";
 import { logger } from "./tools/logger";
 import { rlBus, rlPrompt, startReadline } from "./tools/readline";
 
@@ -14,6 +14,11 @@ async function main() {
         if (isProcessing) {
             logger.warn("Já estou processando uma pergunta, aguarde...");
             return;
+        }
+        const dbFiles = await dbMetadataService.getDBWithoutMetadata();
+        if (dbFiles.length > 0) {
+            logger.info("Arquivos de banco de dados encontrados:", dbFiles);
+            await dbMetadataService.execute(dbFiles);
         }
 
         isProcessing = true;

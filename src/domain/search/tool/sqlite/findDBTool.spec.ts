@@ -1,18 +1,23 @@
 import { describe, test, expect } from "bun:test";
 import { Database } from "bun:sqlite";
-import { FindMusicDBService } from "./findMusicDBService"
+import { FindDBService } from "./findDBService"
 import { SQL_DATABASE_PATH } from "@/src/config";
-import { FindMusicDBTool } from "./tool";
-import { docFindDBMusicTool } from './doc';
+import { FakeEmbeddings } from "langchain/embeddings/fake";
+import { EmbeddingService } from "@/src/infra/gateway/embedding.service";
+import { UseSQLiteTool } from "./useSQLite";
 
-describe("FindMusicDBService.selectFromDatabase", () => {
+
+describe("FindMusicDBService.selectFromDatabase", async () => {
     const db = new Database(`${SQL_DATABASE_PATH}/music.db`);
+    const embedding = new FakeEmbeddings();
+    const embeddingService = new EmbeddingService(embedding);
 
-    const service = new FindMusicDBService(db);
-    const tool = new FindMusicDBTool(docFindDBMusicTool, service);
+    const service = new FindDBService();
+    const tool = new UseSQLiteTool(service, embeddingService);
 
     test("should return music data", async () => {
         const params = {
+            path: `${SQL_DATABASE_PATH}/music.db`,
             table: "Album",
             filters: "ArtistId = '1'",
             columns: ["Title", "ArtistId"]
@@ -28,6 +33,7 @@ describe("FindMusicDBService.selectFromDatabase", () => {
 
     test("should handle empty result", async () => {
         const params = {
+            path: `${SQL_DATABASE_PATH}/music.db`,
             table: "Album",
             filters: "ArtistId = '999'",
             columns: ["Title", "ArtistId"]
@@ -43,6 +49,7 @@ describe("FindMusicDBService.selectFromDatabase", () => {
 
     test("should handle invalid table", async () => {
         const params = {
+            path: `${SQL_DATABASE_PATH}/music.db`,
             table: "InvalidTable",
             filters: "ArtistId = '1'",
             columns: ["Title", "ArtistId"]

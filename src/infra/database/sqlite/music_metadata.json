@@ -11,7 +11,7 @@
             4,
             5
           ],
-          "description": "Unique identifier for the album."
+          "description": "Identificador único para o álbum."
         },
         "Title": {
           "sample_values": [
@@ -21,7 +21,7 @@
             "Let There Be Rock",
             "Big Ones"
           ],
-          "description": "Title of the album."
+          "description": "Título do álbum."
         },
         "ArtistId": {
           "sample_values": [
@@ -31,10 +31,10 @@
             1,
             3
           ],
-          "description": "Foreign key referencing the Artist table, indicating the artist of the album."
+          "description": "Identificador do artista que criou o álbum (chave estrangeira para a tabela Artist)."
         }
       },
-      "table_description": "Stores information about music albums."
+      "table_description": "Armazena informações sobre os álbuns de música."
     },
     "Artist": {
       "columns": {
@@ -46,7 +46,7 @@
             4,
             5
           ],
-          "description": "Unique identifier for the artist."
+          "description": "Identificador único para o artista."
         },
         "Name": {
           "sample_values": [
@@ -56,10 +56,10 @@
             "Alanis Morissette",
             "Alice In Chains"
           ],
-          "description": "Name of the artist."
+          "description": "Nome do artista."
         }
       },
-      "table_description": "Stores information about music artists."
+      "table_description": "Armazena informações sobre os artistas musicais."
     },
     "Customer": {
       "columns": {
@@ -71,7 +71,7 @@
             4,
             5
           ],
-          "description": "Unique identifier for the customer."
+          "description": "Identificador único para o cliente."
         },
         "FirstName": {
           "sample_values": [
@@ -81,7 +81,7 @@
             "Bjørn",
             "František"
           ],
-          "description": "First name of the customer."
+          "description": "Primeiro nome do cliente."
         },
         "LastName": {
           "sample_values": [
@@ -91,7 +91,7 @@
             "Hansen",
             "Wichterlová"
           ],
-          "description": "Last name of the customer."
+          "description": "Sobrenome do cliente."
         },
         "Company": {
           "sample_values": [
@@ -101,7 +101,7 @@
             null,
             "JetBrains s.r.o."
           ],
-          "description": "Company name of the customer, if applicable."
+          "description": "Nome da empresa do cliente, se aplicável."
         },
         "Address": {
           "sample_values": [
@@ -111,7 +111,7 @@
             "Ullevålsveien 14",
             "Klanova 9/506"
           ],
-          "description": "Street address of the customer."
+          "description": "Endereço do cliente."
         },
         "City": {
           "sample_values": [
@@ -121,7 +121,7 @@
             "Oslo",
             "Prague"
           ],
-          "description": "City of the customer."
+          "description": "Cidade do cliente."
         },
         "State": {
           "sample_values": [
@@ -131,7 +131,7 @@
             null,
             null
           ],
-          "description": "State or province of the customer."
+          "description": "Estado ou província do cliente."
         },
         "Country": {
           "sample_values": [
@@ -141,7 +141,7 @@
             "Norway",
             "Czech Republic"
           ],
-          "description": "Country of the customer."
+          "description": "País do cliente."
         },
         "PostalCode": {
           "sample_values": [
@@ -151,7 +151,7 @@
             "0171",
             "14700"
           ],
-          "description": "Postal code of the customer."
+          "description": "Código postal do cliente."
         },
         "Phone": {
           "sample_values": [
@@ -161,7 +161,7 @@
             "+47 22 44 22 22",
             "+420 2 4172 5555"
           ],
-          "description": "Phone number of the customer."
+          "description": "Número de telefone do cliente."
         },
         "Fax": {
           "sample_values": [
@@ -171,7 +171,7 @@
             null,
             "+420 2 4172 5555"
           ],
-          "description": "Fax number of the customer."
+          "description": "Número de fax do cliente."
         },
         "Email": {
           "sample_values": [
@@ -181,7 +181,7 @@
             "bjorn.hansen@yahoo.no",
             "frantisekw@jetbrains.com"
           ],
-          "description": "Email address of the customer."
+          "description": "Endereço de e-mail do cliente."
         },
         "SupportRepId": {
           "sample_values": [
@@ -191,10 +191,10 @@
             4,
             4
           ],
-          "description": "Foreign key referencing the Employee table, indicating the support representative assigned to the customer."
+          "description": "Identificador do representante de suporte atribuído ao cliente (chave estrangeira para a tabela Employee)."
         }
       },
-      "table_description": "Stores information about customers."
+      "table_description": "Armazena informações sobre os clientes."
     },
     "Employee": {
       "columns": {
@@ -206,7 +206,7 @@
             4,
             5
           ],
-          "description": "Unique identifier for the employee."
+          "description": "Identificador único para o funcionário."
         },
         "LastName": {
           "sample_values": [
@@ -216,7 +216,7 @@
             "Park",
             "Johnson"
           ],
-          "description": "Last name of the employee."
+          "description": "Sobrenome do funcionário."
         },
         "FirstName": {
           "sample_values": [
@@ -226,7 +226,7 @@
             "Margaret",
             "Steve"
           ],
-          "description": "First name of the employee."
+          "description": "Primeiro nome do funcionário."
         },
         "Title": {
           "sample_values": [
@@ -236,7 +236,7 @@
             "Sales Support Agent",
             "Sales Support Agent"
           ],
-          "description": "Job title of the employee."
+          "description": "Cargo do funcionário."
         },
         "ReportsTo": {
           "sample_values": [
@@ -246,7 +246,7 @@
             2,
             2
           ],
-          "description": "Foreign key referencing the Employee table itself, indicating the manager this employee reports to."
+          "description": "Identificador do gerente a quem o funcionário se reporta (chave estrangeira auto-referenciada para a tabela Employee)."
         },
         "BirthDate": {
           "sample_values": [
@@ -256,7 +256,7 @@
             "1947-09-19 00:00:00",
             "1965-03-03 00:00:00"
           ],
-          "description": "Date of birth of the employee."
+          "description": "Data de nascimento do funcionário."
         },
         "HireDate": {
           "sample_values": [
@@ -266,7 +266,7 @@
             "2003-05-03 00:00:00",
             "2003-10-17 00:00:00"
           ],
-          "description": "Date when the employee was hired."
+          "description": "Data de contratação do funcionário."
         },
         "Address": {
           "sample_values": [
@@ -276,7 +276,7 @@
             "683 10 Street SW",
             "7727B 41 Ave"
           ],
-          "description": "Street address of the employee."
+          "description": "Endereço do funcionário."
         },
         "City": {
           "sample_values": [
@@ -286,7 +286,7 @@
             "Calgary",
             "Calgary"
           ],
-          "description": "City of the employee."
+          "description": "Cidade do funcionário."
         },
         "State": {
           "sample_values": [
@@ -296,7 +296,7 @@
             "AB",
             "AB"
           ],
-          "description": "State or province of the employee."
+          "description": "Estado ou província do funcionário."
         },
         "Country": {
           "sample_values": [
@@ -306,7 +306,7 @@
             "Canada",
             "Canada"
           ],
-          "description": "Country of the employee."
+          "description": "País do funcionário."
         },
         "PostalCode": {
           "sample_values": [
@@ -316,7 +316,7 @@
             "T2P 5G3",
             "T3B 1Y7"
           ],
-          "description": "Postal code of the employee."
+          "description": "Código postal do funcionário."
         },
         "Phone": {
           "sample_values": [
@@ -326,7 +326,7 @@
             "+1 (403) 263-4423",
             "1 (780) 836-9987"
           ],
-          "description": "Phone number of the employee."
+          "description": "Número de telefone do funcionário."
         },
         "Fax": {
           "sample_values": [
@@ -336,7 +336,7 @@
             "+1 (403) 263-4289",
             "1 (780) 836-9543"
           ],
-          "description": "Fax number of the employee."
+          "description": "Número de fax do funcionário."
         },
         "Email": {
           "sample_values": [
@@ -346,10 +346,10 @@
             "margaret@chinookcorp.com",
             "steve@chinookcorp.com"
           ],
-          "description": "Email address of the employee."
+          "description": "Endereço de e-mail do funcionário."
         }
       },
-      "table_description": "Stores information about employees, including their hierarchy."
+      "table_description": "Armazena informações sobre os funcionários."
     },
     "Genre": {
       "columns": {
@@ -361,7 +361,7 @@
             4,
             5
           ],
-          "description": "Unique identifier for the genre."
+          "description": "Identificador único para o gênero musical."
         },
         "Name": {
           "sample_values": [
@@ -371,10 +371,10 @@
             "Alternative & Punk",
             "Rock And Roll"
           ],
-          "description": "Name of the music genre."
+          "description": "Nome do gênero musical."
         }
       },
-      "table_description": "Stores information about music genres."
+      "table_description": "Armazena informações sobre os gêneros musicais."
     },
     "Invoice": {
       "columns": {
@@ -386,7 +386,7 @@
             4,
             5
           ],
-          "description": "Unique identifier for the invoice."
+          "description": "Identificador único para a fatura."
         },
         "CustomerId": {
           "sample_values": [
@@ -396,7 +396,7 @@
             14,
             23
           ],
-          "description": "Foreign key referencing the Customer table, indicating the customer who received the invoice."
+          "description": "Identificador do cliente associado à fatura (chave estrangeira para a tabela Customer)."
         },
         "InvoiceDate": {
           "sample_values": [
@@ -406,7 +406,7 @@
             "2009-01-06 00:00:00",
             "2009-01-11 00:00:00"
           ],
-          "description": "Date and time the invoice was issued."
+          "description": "Data e hora de emissão da fatura."
         },
         "BillingAddress": {
           "sample_values": [
@@ -416,7 +416,7 @@
             "8210 111 ST NW",
             "69 Salem Street"
           ],
-          "description": "Street address for billing on the invoice."
+          "description": "Endereço de cobrança da fatura."
         },
         "BillingCity": {
           "sample_values": [
@@ -426,7 +426,7 @@
             "Edmonton",
             "Boston"
           ],
-          "description": "City for billing on the invoice."
+          "description": "Cidade de cobrança da fatura."
         },
         "BillingState": {
           "sample_values": [
@@ -436,7 +436,7 @@
             "AB",
             "MA"
           ],
-          "description": "State or province for billing on the invoice."
+          "description": "Estado ou província de cobrança da fatura."
         },
         "BillingCountry": {
           "sample_values": [
@@ -446,7 +446,7 @@
             "Canada",
             "USA"
           ],
-          "description": "Country for billing on the invoice."
+          "description": "País de cobrança da fatura."
         },
         "BillingPostalCode": {
           "sample_values": [
@@ -456,7 +456,7 @@
             "T6G 2C7",
             "2113"
           ],
-          "description": "Postal code for billing on the invoice."
+          "description": "Código postal de cobrança da fatura."
         },
         "Total": {
           "sample_values": [
@@ -466,10 +466,10 @@
             8.91,
             13.86
           ],
-          "description": "Total amount of the invoice."
+          "description": "Valor total da fatura."
         }
       },
-      "table_description": "Stores information about customer invoices."
+      "table_description": "Armazena informações sobre as faturas dos clientes."
     },
     "InvoiceLine": {
       "columns": {
@@ -481,7 +481,7 @@
             4,
             5
           ],
-          "description": "Unique identifier for the invoice line item."
+          "description": "Identificador único para o item da linha da fatura."
         },
         "InvoiceId": {
           "sample_values": [
@@ -491,7 +491,7 @@
             2,
             2
           ],
-          "description": "Foreign key referencing the Invoice table, indicating the invoice this line item belongs to."
+          "description": "Identificador da fatura à qual este item de linha pertence (chave estrangeira para a tabela Invoice)."
         },
         "TrackId": {
           "sample_values": [
@@ -501,7 +501,7 @@
             8,
             10
           ],
-          "description": "Foreign key referencing the Track table, indicating the track purchased in this line item."
+          "description": "Identificador da faixa de música comprada (chave estrangeira para a tabela Track)."
         },
         "UnitPrice": {
           "sample_values": [
@@ -511,7 +511,7 @@
             0.99,
             0.99
           ],
-          "description": "Unit price of the track at the time of purchase."
+          "description": "Preço unitário da faixa no momento da compra."
         },
         "Quantity": {
           "sample_values": [
@@ -521,10 +521,10 @@
             1,
             1
           ],
-          "description": "Quantity of the track purchased in this line item."
+          "description": "Quantidade da faixa comprada."
         }
       },
-      "table_description": "Stores details of individual items included in an invoice."
+      "table_description": "Armazena os itens individuais de cada fatura."
     },
     "MediaType": {
       "columns": {
@@ -536,7 +536,7 @@
             4,
             5
           ],
-          "description": "Unique identifier for the media type."
+          "description": "Identificador único para o tipo de mídia."
         },
         "Name": {
           "sample_values": [
@@ -546,10 +546,10 @@
             "Purchased AAC audio file",
             "AAC audio file"
           ],
-          "description": "Name of the media type (e.g., audio, video format)."
+          "description": "Nome do tipo de mídia (por exemplo, 'arquivo de áudio MPEG')."
         }
       },
-      "table_description": "Stores information about different media types for tracks."
+      "table_description": "Armazena informações sobre os diferentes tipos de mídia para as faixas."
     },
     "Playlist": {
       "columns": {
@@ -561,7 +561,7 @@
             4,
             5
           ],
-          "description": "Unique identifier for the playlist."
+          "description": "Identificador único para a playlist."
         },
         "Name": {
           "sample_values": [
@@ -571,10 +571,10 @@
             "Audiobooks",
             "90’s Music"
           ],
-          "description": "Name of the playlist."
+          "description": "Nome da playlist."
         }
       },
-      "table_description": "Stores information about music playlists."
+      "table_description": "Armazena informações sobre as playlists de música."
     },
     "PlaylistTrack": {
       "columns": {
@@ -586,7 +586,7 @@
             1,
             1
           ],
-          "description": "Foreign key referencing the Playlist table, indicating the playlist."
+          "description": "Identificador da playlist (chave estrangeira para a tabela Playlist)."
         },
         "TrackId": {
           "sample_values": [
@@ -596,10 +596,10 @@
             3391,
             3392
           ],
-          "description": "Foreign key referencing the Track table, indicating the track included in the playlist."
+          "description": "Identificador da faixa de música (chave estrangeira para a tabela Track)."
         }
       },
-      "table_description": "Junction table linking tracks to playlists, indicating which tracks are in which playlists."
+      "table_description": "Tabela de junção que associa faixas a playlists, indicando quais faixas estão em cada playlist."
     },
     "Track": {
       "columns": {
@@ -611,7 +611,7 @@
             4,
             5
           ],
-          "description": "Unique identifier for the track."
+          "description": "Identificador único para a faixa de música."
         },
         "Name": {
           "sample_values": [
@@ -621,7 +621,7 @@
             "Restless and Wild",
             "Princess of the Dawn"
           ],
-          "description": "Title or name of the track."
+          "description": "Nome da faixa."
         },
         "AlbumId": {
           "sample_values": [
@@ -631,7 +631,7 @@
             3,
             3
           ],
-          "description": "Foreign key referencing the Album table, indicating the album the track belongs to."
+          "description": "Identificador do álbum ao qual a faixa pertence (chave estrangeira para a tabela Album)."
         },
         "MediaTypeId": {
           "sample_values": [
@@ -641,7 +641,7 @@
             2,
             2
           ],
-          "description": "Foreign key referencing the MediaType table, indicating the media type of the track."
+          "description": "Identificador do tipo de mídia da faixa (chave estrangeira para a tabela MediaType)."
         },
         "GenreId": {
           "sample_values": [
@@ -651,7 +651,7 @@
             1,
             1
           ],
-          "description": "Foreign key referencing the Genre table, indicating the genre of the track."
+          "description": "Identificador do gênero da faixa (chave estrangeira para a tabela Genre)."
         },
         "Composer": {
           "sample_values": [
@@ -661,7 +661,7 @@
             "F. Baltes, R.A. Smith-Diesel, S. Kaufman, U. Dirkscneider & W. Hoffman",
             "Deaffy & R.A. Smith-Diesel"
           ],
-          "description": "Composer(s) of the track."
+          "description": "Compositor(es) da faixa."
         },
         "Milliseconds": {
           "sample_values": [
@@ -671,7 +671,7 @@
             252051,
             375418
           ],
-          "description": "Duration of the track in milliseconds."
+          "description": "Duração da faixa em milissegundos."
         },
         "Bytes": {
           "sample_values": [
@@ -681,7 +681,7 @@
             4331779,
             6290521
           ],
-          "description": "Size of the track in bytes."
+          "description": "Tamanho da faixa em bytes."
         },
         "UnitPrice": {
           "sample_values": [
@@ -691,10 +691,10 @@
             0.99,
             0.99
           ],
-          "description": "Unit price of the track."
+          "description": "Preço unitário da faixa."
         }
       },
-      "table_description": "Stores information about individual music tracks."
+      "table_description": "Armazena informações detalhadas sobre as faixas de música individuais."
     }
   }
 }

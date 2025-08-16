@@ -3,32 +3,38 @@ import { SEARCH_AGENT_STEPS } from "@/src/domain/search/selfAskWithSearch/types/
 import type { SearchAgentDTO, SelfAskDTO } from "@/src/domain/search/selfAskWithSearch/types/dto";
 import { selfAskState } from "@/src/domain/search/selfAskWithSearch/types";
 import { ERROR_MESSAGE } from "@/src/config";
-import type { resolveToolType } from "@/src/domain/search/tools/type";
 import { logger } from "@/src/tools/logger";
 import { formatAgentPrompt, useTools } from "./prompt";
+import type { ToolBoxService } from "../tool/service";
+import type { BaseMessagePromptTemplateLike } from "@langchain/core/prompts";
 
 export class SelfAskWithSearchStrategy {
     public readonly boundCallNode;
     public readonly boundRoute;
-    private bindedTools: boolean = false;
+    private tools: BaseMessagePromptTemplateLike[] = [];
 
     constructor(
         private readonly model: IAgentLLMService,
-        readonly searchAgentTools: resolveToolType[] = []
+        private readonly toolBox: ToolBoxService
     ) {
-        if (this.model.bindTools) {
-            this.model.bindTools(searchAgentTools);
-            this.bindedTools = true;
-        } else {
-            logger.error(ERROR_MESSAGE.NOT_SUPPORT_BIND_TOOLS);
-        }
         this.boundCallNode = this.callNode.bind(this);
         this.boundRoute = this.route.bind(this);
     }
 
+    async init() {
+        const tools = await this.toolBox.getAllTools();
+
+        if (this.model.bindTools) {
+            this.model.bindTools(tools);
+        } else {
+            logger.error(ERROR_MESSAGE.NOT_SUPPORT_BIND_TOOLS);
+            this.tools = useTools(tools);
+        }
+    }
+
     async callNode(state: SearchAgentDTO): Promise<SearchAgentDTO> {
-        const tools = useTools(this.bindedTools, this.searchAgentTools);
-        const prompt = await formatAgentPrompt(state, tools);
+        const prompt = await formatAgentPrompt(state, this.tools);
+        
         const chain = prompt.pipe(this.model)
         const chainResult = await chain.invoke({});
         const rawContent = chainResult.text.replace("```json", "").replace("```", "");

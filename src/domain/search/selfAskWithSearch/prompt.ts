@@ -4,7 +4,7 @@ import { AnswerTypeStrategy } from "../../core/types/answerType";
 import { SEARCH_AGENT_STEPS } from "./types/steps";
 import { toJsonSchema } from "@langchain/core/utils/json_schema";
 import { selfAskState } from "./types";
-import type { resolveToolType } from "../tools/type";
+import type { DynamicStructuredTool } from "@langchain/core/tools";
 
 export const agentSearchPrompt: BaseMessagePromptTemplateLike[] = [
     { role: "system", content: "Você faz parte de um time de agentes que tem como objetivo resolver o problema enviado pelo cliente, antes do problema chegar em você ele já passou pelo 'assistente' que fez uma análise inicial, classificou o tipo do problema como {problem_type} e começou a decompor o problema em partes menores." },
@@ -18,12 +18,8 @@ export const agentSearchPrompt: BaseMessagePromptTemplateLike[] = [
     { role: "user", content: "As informações faltantes são: {missing}" },
 ]
 
-export function useTools(bindedTools: boolean, searchAgentTools: resolveToolType[]): BaseMessagePromptTemplateLike[] {
-    if (bindedTools) {
-        return [];
-    }
-
-    const tools = searchAgentTools.map(tool => {
+export function useTools(toolBox: DynamicStructuredTool[]): BaseMessagePromptTemplateLike[] {
+    const tools = toolBox.map(tool => {
         const schema = (toJsonSchema(tool.schema) as any).properties;
         return `Nome da ferramenta: ${tool.name}, Descrição da ferramenta e como usar: ${tool.description}, Schema do input esperado pela ferramenta: ${schema}`;
     }).join("\n");
