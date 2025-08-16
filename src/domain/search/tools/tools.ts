@@ -8,26 +8,19 @@ import type { FindMusicDBTool } from "@/src/domain/search/tools/musicDB/tool";
 import { logger } from "@/src/tools/logger";
 import { persistentTalk } from "../../core/interference/helper/persistentTalk";
 import { HUMAN_RESPONSE, INTERRUPT_TYPES, type InterruptType } from "../../core/types/human";
-import * as cheerio from "cheerio";
 
 export class SearchAgentTools {
     searchAgentTools: resolveToolType[] = [];
-
-    protected getPageTool: resolveToolType;
-    protected findDBMusicTool: resolveToolType;
 
     public readonly boundGetPage;
     public readonly boundFindDBMusic;
 
     constructor(
-        getPageTool: GetPageTool,
-        findDBMusicTool: FindMusicDBTool
+        private getPageTool: GetPageTool,
+        private findDBMusicTool: FindMusicDBTool
     ){
-        this.getPageTool = getPageTool.current;
-        this.findDBMusicTool = findDBMusicTool.current;
-
-        this.searchAgentTools.push(this.getPageTool);
-        this.searchAgentTools.push(this.findDBMusicTool);
+        this.searchAgentTools.push(this.getPageTool.current);
+        this.searchAgentTools.push(this.findDBMusicTool.current);
 
         this.boundGetPage = this.getPage.bind(this);
         this.boundFindDBMusic = this.getMusicDB.bind(this);
@@ -55,24 +48,15 @@ export class SearchAgentTools {
             state.permissions.add("INTERNET");
         }
         
-        let newItemToHistory = "";
+        const userInput = state.userInput
         const rawStateContent = JSON.parse(state.llMOutput.content)
         const params = docPageTool.schema.parse(rawStateContent);
-
-        try {
-            logger.thinking(`Buscando página: ${params.url}`);
-            const bruteHTML = await this.getPageTool.invoke({ url: params.url });
-            const $ = cheerio.load(bruteHTML);
-            // ADD SIMILAR TO docPageTool -- Embedding
-            newItemToHistory = $("body").text().replace(/\s+/g, ' ').trim()
-        } catch (error) {
-            logger.error("Error occurred while fetching page:", error);
-            newItemToHistory = `Não consegui acessar a página ${params.url}`;
-        }
-
+        const rawResult = await this.getPageTool.current.invoke({ url: params.url });
+        const result = await this.getPageTool.traitResult(params.url, rawResult, userInput);
+        
         const newState: SearchAgentDTO = {
             ...state,
-            history: [...state.history, newItemToHistory],
+            history: [...state.history, result],
             searchedSources: [ ...state.searchedSources, params.url ],
             llMOutput: { ...state.llMOutput, step: "ANALYZE" },
         };
@@ -87,12 +71,14 @@ export class SearchAgentTools {
         const rawStateContent = JSON.parse(state.llMOutput.content);
         const { table, columns, filters } = docFindDBMusicTool.schema.parse(rawStateContent);
 
-        const response = await this.findDBMusicTool.invoke({ table, columns, filters });
-        const resultContent = response.join("\n");
+        const userInput = state.userInput;
+        const rawResult = await this.findDBMusicTool.current.invoke({ table, columns, filters });
+        const name = `${table} - ${filters || "none"} - ${columns?.join(", ") || "all"}`;
+        const result = await this.findDBMusicTool.traitResult(name, rawResult, userInput);
 
         const newState: SearchAgentDTO = {
             ...state,
-            history: [...state.history, resultContent],
+            history: [...state.history, result],
             searchedSources: [ ...state.searchedSources, `music_db:${table}` ],
             llMOutput: { ...state.llMOutput, step: "ANALYZE" },
         };

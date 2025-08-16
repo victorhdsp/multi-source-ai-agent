@@ -32,4 +32,6 @@ export const ERROR_MESSAGE = {
     },
     FAIL_TO_PARSE: "Falha ao analisar a saída do modelo.",
     NOT_SUPPORT_BIND_TOOLS: "Este modelo não suporta vinculação de ferramentas via bindTools, utilizando métodos manuais.",
+    NO_ACCESS_TO_PAGE: (url: string) => `Não consegui acessar a página ${url}.`,
+    NO_ACCESS_TO_DB: (table: string, database:string) => `Não consegui acessar a tabela ${table} do banco de dados ${database}.`,
 }

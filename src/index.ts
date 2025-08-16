@@ -19,7 +19,7 @@ async function main() {
         isProcessing = true;
         try {
             const response = await callToMultiAgentUseCase.execute(question);
-            logger.talk("Resposta:", response);
+            logger.talk("Response:", response);
 
         } catch (err) {
             logger.error("Erro:", err);
