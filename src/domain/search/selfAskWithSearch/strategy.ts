@@ -44,6 +44,10 @@ export class SelfAskWithSearchStrategy {
                 numberOfSteps: state.numberOfSteps + 1
             };
 
+            if (newState.llMOutput.step === SEARCH_AGENT_STEPS.ANALYZE) {
+                newState.llMOutput.step = SEARCH_AGENT_STEPS.STOP;
+            }
+
             logger.thinking(output.content);
             logger.state(newState);
 
