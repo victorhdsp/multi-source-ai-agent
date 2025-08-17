@@ -13,15 +13,17 @@ export const agentSearchPrompt: BaseMessagePromptTemplateLike[] = [
     { role: "user", content: "Caso olhando para as ferramentas disponíveis você ache que não vai conseguir obter a resposta, então retorne um erro, mas jamais responda sem ter uma informação precisa disponível." },
     { role: "user", content: "O histórico atual de informações é: {history}" },
     { role: "user", content: "Você vai receber uma lista de informações faltantes que devem ser importantes para resolver o problema, você pode adicionar novas informações que você julgar necessário, você tambem pode remover, porém apenas se no histórico tiver a informação que responda essa pergutna." },
-    { role: "user", content: "Esse é um schema feito no Zod que representa o formato da resposta, ela sempre deve seguir esse schema: {format_instructions}, dentro do schema tem `type` que não deve ser modficado, `step` é usado para que o cliente tenha noção do passo atual, porém eles tem valores específicos que são: {steps}, caso você consiga responder a pergunta utilize o step de WHATNOT e caso esteja resolvido mesmo que ainda tenha perguntas use o step de STOP." },
+    { role: "user", content: "Esse é um schema feito no Zod que representa o formato da resposta, ela sempre deve seguir esse schema: {format_instructions}, todos os campos são obrigatórios, dentro do schema tem `type` que não deve ser modficado, `step` é usado para que o cliente tenha noção do passo atual, porém eles tem valores específicos que são: {steps}, caso você consiga responder a pergunta utilize o step de WHATNOT e caso esteja resolvido mesmo que ainda tenha perguntas use o step de STOP." },
     { role: "user", content: "O problema do usuário é: {problem}" },
     { role: "user", content: "As informações faltantes são: {missing}" },
+    { role: "user", content: "As fontes que você já buscou são: {searched_sources}, no caso de você já ter buscado uma fonte não deve buscá-la novamente." }
 ]
 
 export function useTools(toolBox: DynamicStructuredTool[]): BaseMessagePromptTemplateLike[] {
     const tools = toolBox.map(tool => {
         const schema = (toJsonSchema(tool.schema) as any).properties;
-        return `Nome da ferramenta: ${tool.name}, Descrição da ferramenta e como usar: ${tool.description}, Schema do input esperado pela ferramenta: ${schema}`;
+        const schemaString = ("```json\n" + JSON.stringify(schema, null, 2) + "\n```").replaceAll(/{|}/g, "|");
+        return `Nome da ferramenta: ${tool.name}, Descrição da ferramenta e como usar: ${tool.description}, Schema do input esperado pela ferramenta: ${schemaString}`;
     }).join("\n");
 
     const prompt: BaseMessagePromptTemplateLike[] = [
@@ -29,6 +31,7 @@ export function useTools(toolBox: DynamicStructuredTool[]): BaseMessagePromptTem
         { role: "user", content: tools },
         { role: "user", content: "Para utilizar essas ferramentas, seguindo o schema, você deve marcar o step correspondente e o content deve ser uma string contendo o schema de parâmetros." }
     ];
+
     return prompt;
 }
 
@@ -55,6 +58,7 @@ export async function formatAgentPrompt(state: SearchAgentDTO, tools: BaseMessag
             steps: steps,
             problem: state.userInput,
             missing: state.llMOutput.missing.join(", "),
+            searched_sources: state.searchedSources.join(", ")
         });
 
     return prompt;

@@ -8,9 +8,11 @@ import * as cheerio from 'cheerio';
 import type { EmbeddingService } from '@/src/infra/gateway/embedding.service';
 import type { IDocumentTool, ITool } from '../type';
 import type { SearchAgentDTO } from '../../selfAskWithSearch/types/dto';
-import type { PermissionManager } from '../permissions';
 import { persistentTalk } from '@/src/domain/core/interference/helper/persistentTalk';
-import { HUMAN_RESPONSE, INTERRUPT_TYPES } from '@/src/domain/core/types/human';
+import { HUMAN_RESPONSE, INTERRUPT_TYPES } from '@/src/domain/core/interference/type';
+import { SEARCH_AGENT_STEPS } from '../../selfAskWithSearch/types/steps';
+import { safeJsonParse } from '@/src/utils/safeParser';
+import chalk from "chalk";
 
 interface UseCurlTraitment {
     url: string;
@@ -26,8 +28,14 @@ export class UseCurlTool implements ITool<UseCurlConsume, UseCurlTraitment> {
 
     async getDoc(): Promise<IDocumentTool> {
         return {
-            name: "useCurl",
-            description: "A tool for making HTTP requests using curl",
+            name: SEARCH_AGENT_STEPS.USE_CURL,
+            description: (
+                "A ferramenta para fazer requisições HTTP utilizando curl" +
+                "Você pode usar essa ferramenta para acessar páginas da web e extrair informações relevantes." +
+                "Regras:" +
+                "   - Caso o usuário forneça uma URL, você deve fazer a requisição para essa URL e retornar o conteúdo da página." +
+                "   - Se a URL não for fornecida, você pode fazer uma busca genérica na web, utilizando sites de busca para coletar a informação através de (https://www.google.com/search?q=<conteudo>), (https://www.bing.com/search?q=<conteudo>) ou na (https://pt.wikipedia.org/wiki/<nome>)."
+            ),
             schema: useCurlConsume
         };
     }
@@ -44,10 +52,12 @@ export class UseCurlTool implements ITool<UseCurlConsume, UseCurlTraitment> {
     }
 
     private async requestInternetPermission(state: SearchAgentDTO): Promise<boolean> {
+        const { url } = safeJsonParse<UseCurlConsume>(state.llMOutput.content);
+
         if (!state.permissions.has("INTERNET")) {
             const prompt = (
                 "Para conseguir continuar preciso fazer a busca em uma pagina da internet: \n" +
-                `${state.llMOutput.content}\n` +
+                chalk.italic.underline(`${url}\n`) +
                 "Tenho permissão para fazer isso? (y/n)"
             )
 
@@ -71,7 +81,8 @@ export class UseCurlTool implements ITool<UseCurlConsume, UseCurlTraitment> {
     
         } catch (err) {
             const error = err as Error; 
-            logger.error(error.message);
+            logger.error("[useCurl] (execute):", error.message);
+            logger.errorState(error.message, "[useCurl] - Execute");
             return ERROR_MESSAGE.NO_ACCESS_TO_PAGE(params.url);
         }
     }
@@ -90,19 +101,21 @@ export class UseCurlTool implements ITool<UseCurlConsume, UseCurlTraitment> {
     
         } catch (err) {
             const error = err as Error;
-            logger.error(error.message);
+            logger.error("[useCurl] (traitResult):", error.message);
+            logger.errorState(error.message, "[useCurl] - TraitResult");
             return ERROR_MESSAGE.NO_ACCESS_TO_PAGE(url);
         }
     }
 
     async useNode(state: SearchAgentDTO): Promise<SearchAgentDTO> {
+        const hasPermission = await this.requestInternetPermission(state);
+        
         try {
-            const hasPermission = await this.requestInternetPermission(state);
             if (!hasPermission) throw new Error(ERROR_MESSAGE.NO_PERMISSION_TO_WEB_SEARCH);
             state.permissions.add("INTERNET");
 
             const userInput = state.userInput
-            const rawStateContent = JSON.parse(state.llMOutput.content)
+            const rawStateContent = safeJsonParse<UseCurlConsume>(state.llMOutput.content)
             const { url } = useCurlConsume.parse(rawStateContent);
 
             const tool = await this.getTool();
@@ -122,7 +135,8 @@ export class UseCurlTool implements ITool<UseCurlConsume, UseCurlTraitment> {
             return newState;
         } catch (err) {
             const error = err as Error;
-            logger.error(error.message);
+            logger.error("[useCurl] (useNode):", error.message);
+            logger.errorState(error.message, "[useCurl] - UseNode");
             return { ...state, error: error.message };
         }
     }

@@ -18,6 +18,7 @@ import { UseSQLiteTool } from "./domain/search/tool/sqlite/useSQLite";
 import { GetPageService } from "./domain/search/tool/curl/getPageService";
 import { FindDBService } from "./domain/search/tool/sqlite/findDBService";
 import { DocEmbeddingService } from './tools/embeddingDocuments';
+import { UseQuestionTool } from "./domain/search/tool/question/useQuestion";
 
 class Dependencies {
   constructor (
@@ -46,14 +47,16 @@ class Dependencies {
       findMusicDBService,
       embeddingService
     ),
+    useQuestionTool = new UseQuestionTool(),
     toolBoxService = new ToolBoxService(
       useCurlTool,
-      useSQLiteTool
+      useSQLiteTool,
+      useQuestionTool
     ),
     strategyQuestionAgent = new QuestionAgentStrategy(
       model
     ),
-    strategySearchAgent = new SelfAskWithSearchStrategy(
+    public strategySearchAgent = new SelfAskWithSearchStrategy(
       model,
       toolBoxService
     ),
@@ -80,6 +83,7 @@ class Dependencies {
 
   async init() {
     await this.vectorStore.load(VECTOR_DATABASE_PATH);
+    await this.strategySearchAgent.init();
   }
 }
 

@@ -1,5 +1,5 @@
 import { interrupt } from "@langchain/langgraph";
-import type { InterruptDTO, InterruptType } from "../../types/human";
+import type { InterruptDTO, InterruptType } from "../type";
 import { ERROR_MESSAGE } from "@/src/config";
 import { sleep } from "bun";
 

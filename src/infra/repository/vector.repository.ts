@@ -17,9 +17,8 @@ export class VectorStore implements IVectorStore {
     }
 
     async addDocuments(documents: VectorDocument[]): Promise<void> {
-        if (!this.vectorStore) {
-            throw new Error("Vector store is not initialized. Please load or create the vector store first.");
-        }
+        if (!this.vectorStore) return;
+
         const langchainDocs = documents.map((doc) => ({
             pageContent: doc.pageContent,
             metadata: doc.metadata
@@ -29,9 +28,7 @@ export class VectorStore implements IVectorStore {
     }
 
     async similaritySearch(query: string, k: number): Promise<VectorSearchResult[]> {
-        if (!this.vectorStore) {
-            throw new Error("Vector store is not initialized. Please load or create the vector store first.");
-        }
+        if (!this.vectorStore) return [];
 
         const results = await this.vectorStore.similaritySearchWithScore(query, k);
         
@@ -45,7 +42,6 @@ export class VectorStore implements IVectorStore {
     async save(path: string): Promise<void> {
         if (!this.vectorStore) return;
 
-        
         await fs.mkdir(path, { recursive: true });
         await this.vectorStore.save(path);
     }
@@ -72,7 +68,6 @@ export class VectorStore implements IVectorStore {
             );
             return true;
         } catch (error) {
-            logger.error(`Failed to access vector store at ${path}:`, error);
             return false;
         }
     }

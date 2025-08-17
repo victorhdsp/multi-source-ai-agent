@@ -17,13 +17,13 @@ export class AgentLLMService extends BaseChatModel {
         this.primaryLLM = new ChatGoogleGenerativeAI({
             model: PRIMARY_MODEL,
             apiKey: GOOGLE_API_KEY,
-            temperature: 0
+            temperature: .3
         });
 
         this.secondaryLLM = new ChatGoogleGenerativeAI({
             model: SECONDARY_MODEL,
             apiKey: GOOGLE_API_KEY,
-            temperature: 0
+            temperature: .3
         });
     }
 

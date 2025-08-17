@@ -3,7 +3,7 @@ import { SYSTEM_DATA } from "./config";
 import { callToMultiAgentUseCase, dbMetadataService, dependencies, docEmbeddingService } from "./dependences";
 import { logger } from "./tools/logger";
 import { rlBus, rlPrompt, startReadline, waitForUserInput } from "./tools/readline";
-import { HUMAN_RESPONSE } from "./domain/core/types/human";
+import { HUMAN_RESPONSE } from "./domain/core/interference/type";
 
 async function main() {
     let isProcessing = false;
@@ -44,7 +44,6 @@ async function main() {
 
     rlBus.on("input", async (question) => {
         if (isProcessing) {
-            logger.warn("Já estou processando uma pergunta, aguarde...");
             return;
         }
         
@@ -55,7 +54,8 @@ async function main() {
             await sleep(100); 
 
         } catch (err) {
-            logger.error("Erro:", err);
+            logger.error("[Entry] Erro:", err);
+            logger.errorState(err, "[Entry] - Readline");
         } finally {
             isProcessing = false;
             rlPrompt();
@@ -72,5 +72,6 @@ dependencies.init()
         main();
     })
     .catch((error) => {
-        logger.error("Error initializing dependencies:", error);
+        logger.error("[Entry] Error initializing dependencies:", error);
+        logger.errorState(error, "[Entry] - Initialization");
     });

@@ -7,6 +7,8 @@ import { logger } from "@/src/tools/logger";
 import { formatAgentPrompt, useTools } from "./prompt";
 import type { ToolBoxService } from "../tool/service";
 import type { BaseMessagePromptTemplateLike } from "@langchain/core/prompts";
+import { safeJsonParse } from "@/src/utils/safeParser";
+import { secureExec } from "@/src/utils/secureExec";
 
 export class SelfAskWithSearchStrategy {
     public readonly boundCallNode;
@@ -27,23 +29,23 @@ export class SelfAskWithSearchStrategy {
         if (this.model.bindTools) {
             this.model.bindTools(tools);
         } else {
-            logger.error(ERROR_MESSAGE.NOT_SUPPORT_BIND_TOOLS);
+            logger.warn("[SelfAskWithSearch] (init):", ERROR_MESSAGE.NOT_SUPPORT_BIND_TOOLS);
             this.tools = useTools(tools);
         }
     }
 
     async callNode(state: SearchAgentDTO): Promise<SearchAgentDTO> {
-        const prompt = await formatAgentPrompt(state, this.tools);
-        
-        const chain = prompt.pipe(this.model)
-        const chainResult = await chain.invoke({});
-        const rawContent = chainResult.text.replace("```json", "").replace("```", "");
-
         try {
-            const rawParsedOutput = JSON.parse(rawContent);
-            rawParsedOutput.type = state.llMOutput.type;
-            const output = selfAskState.parse(rawParsedOutput);
-            
+            const prompt = await formatAgentPrompt(state, this.tools);
+            const chain = prompt.pipe(this.model)
+            const chainResult = await chain.invoke({});
+
+            const output = secureExec(() => {
+                const rawParsedOutput = safeJsonParse<SelfAskDTO>(chainResult.text);
+                rawParsedOutput.type = state.llMOutput.type;
+                return selfAskState.parse(rawParsedOutput);
+            }, ERROR_MESSAGE.FAIL_TO_PARSE);
+
             const newState: SearchAgentDTO = {
                 ...state,
                 llMOutput: output as SelfAskDTO,
@@ -58,14 +60,16 @@ export class SelfAskWithSearchStrategy {
             logger.state(newState);
 
             return newState;
-        } catch (error) {
-            throw new Error(ERROR_MESSAGE.FAIL_TO_PARSE)
+        } catch (err) {
+            const error = err as Error;
+            throw new Error(`Erro ao chamar o nó <SelfAskWithSearch> {${error.message}}`);
         }
     }
 
     async route(state: SearchAgentDTO): Promise<string> {
         if (state.error) {
-            logger.error(state.error);
+            logger.error("[SelfAskWithSearch] (Route):", state.error);
+            logger.errorState(state.error, "[SelfAskWithSearch] - Route");
             return SEARCH_AGENT_STEPS.STOP;
         }
 
@@ -74,13 +78,13 @@ export class SelfAskWithSearchStrategy {
             return SEARCH_AGENT_STEPS.STOP;
         }
 
-        if (state.llMOutput.missing.length === 0) {
+        if (state.llMOutput.step === SEARCH_AGENT_STEPS.STOP) {
             logger.thinking("Já sei a resposta!");
             return SEARCH_AGENT_STEPS.STOP;
         }
 
         if (state.llMOutput.step === SEARCH_AGENT_STEPS.WHATNOT) {
-            logger.thinking("Não consegui responder a pergunta.");
+            logger.thinking("Não tenho certeza da resposta.");
             return SEARCH_AGENT_STEPS.WHATNOT;
         }
         

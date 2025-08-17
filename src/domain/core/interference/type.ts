@@ -1,5 +1,6 @@
 export const INTERRUPT_TYPES = {
-    PERMISSION: "PERMISSION"
+    PERMISSION: "PERMISSION",
+    QUESTION: "QUESTION",
 } as const;
 
 export type InterruptType = keyof typeof INTERRUPT_TYPES;
