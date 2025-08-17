@@ -17,6 +17,7 @@ import { UseCurlTool } from "./domain/search/tool/curl/useCurl";
 import { UseSQLiteTool } from "./domain/search/tool/sqlite/useSQLite";
 import { GetPageService } from "./domain/search/tool/curl/getPageService";
 import { FindDBService } from "./domain/search/tool/sqlite/findDBService";
+import { DocEmbeddingService } from './tools/embeddingDocuments';
 
 class Dependencies {
   constructor (
@@ -73,7 +74,8 @@ class Dependencies {
       questionUsecase,
       searchUsecase
     ),
-    public dbMetadataService = new DBMetadataService(model)
+    public dbMetadataService = new DBMetadataService(model),
+    public docEmbeddingService = new DocEmbeddingService(vectorStore)
   ){}
 
   async init() {
@@ -85,5 +87,6 @@ export const dependencies = new Dependencies();
 
 export const { 
   callToMultiAgentUseCase,
-  dbMetadataService
+  dbMetadataService,
+  docEmbeddingService
 } = dependencies;

@@ -96,7 +96,7 @@ export class DBMetadataService {
         logger.info(`Metadata for ${dbPath} written successfully.`);
     }
 
-    async getDBWithoutMetadata(): Promise<string[]> {
+    getDBWithoutMetadata(): string[] {
         try {
             const files = fs.readdirSync(SQL_DATABASE_PATH);
             const dbFiles = files.filter(file => file.endsWith('.db'));

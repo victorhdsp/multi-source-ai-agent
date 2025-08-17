@@ -19,6 +19,11 @@ const resolvePath = (relativePath: string) => {
         fs.mkdirSync(relativePath, { recursive: true });
     }
 }
+
+export const DOCUMENT_TO_EMBED_PATH = path.join(__dirname, '../data/documents/');
+resolvePath(DOCUMENT_TO_EMBED_PATH);
+export const DOCUMENT_METADATA_PATH = path.join(__dirname, 'infra/database/documents');
+resolvePath(DOCUMENT_METADATA_PATH);
 export const SQL_DATABASE_PATH = path.join(__dirname, '../data/sqlite');
 resolvePath(SQL_DATABASE_PATH);
 export const SQL_METADATA_PATH = path.join(__dirname, 'infra/database/sqlite');
