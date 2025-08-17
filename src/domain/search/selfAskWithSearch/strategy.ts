@@ -8,6 +8,7 @@ import { formatAgentPrompt, useTools } from "./prompt";
 import type { ToolBoxService } from "../tool/service";
 import type { BaseMessagePromptTemplateLike } from "@langchain/core/prompts";
 import { safeJsonParse } from "@/src/utils/safeParser";
+import { secureExec } from "@/src/utils/secureExec";
 
 export class SelfAskWithSearchStrategy {
     public readonly boundCallNode;
@@ -34,15 +35,17 @@ export class SelfAskWithSearchStrategy {
     }
 
     async callNode(state: SearchAgentDTO): Promise<SearchAgentDTO> {
-        const prompt = await formatAgentPrompt(state, this.tools);
-        const chain = prompt.pipe(this.model)
-        const chainResult = await chain.invoke({});
-
         try {
-            const rawParsedOutput = safeJsonParse<SelfAskDTO>(chainResult.text);
-            rawParsedOutput.type = state.llMOutput.type;
-            const output = selfAskState.parse(rawParsedOutput);
-            
+            const prompt = await formatAgentPrompt(state, this.tools);
+            const chain = prompt.pipe(this.model)
+            const chainResult = await chain.invoke({});
+
+            const output = secureExec(() => {
+                const rawParsedOutput = safeJsonParse<SelfAskDTO>(chainResult.text);
+                rawParsedOutput.type = state.llMOutput.type;
+                return selfAskState.parse(rawParsedOutput);
+            }, ERROR_MESSAGE.FAIL_TO_PARSE);
+
             const newState: SearchAgentDTO = {
                 ...state,
                 llMOutput: output as SelfAskDTO,
@@ -57,8 +60,9 @@ export class SelfAskWithSearchStrategy {
             logger.state(newState);
 
             return newState;
-        } catch (error) {
-            throw new Error(ERROR_MESSAGE.FAIL_TO_PARSE)
+        } catch (err) {
+            const error = err as Error;
+            throw new Error(`Erro ao chamar o nó <SelfAskWithSearch> {${error.message}}`);
         }
     }
 

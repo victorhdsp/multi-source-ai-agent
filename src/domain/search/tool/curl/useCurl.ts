@@ -12,6 +12,7 @@ import { persistentTalk } from '@/src/domain/core/interference/helper/persistent
 import { HUMAN_RESPONSE, INTERRUPT_TYPES } from '@/src/domain/core/interference/type';
 import { SEARCH_AGENT_STEPS } from '../../selfAskWithSearch/types/steps';
 import { safeJsonParse } from '@/src/utils/safeParser';
+import chalk from "chalk";
 
 interface UseCurlTraitment {
     url: string;
@@ -45,10 +46,12 @@ export class UseCurlTool implements ITool<UseCurlConsume, UseCurlTraitment> {
     }
 
     private async requestInternetPermission(state: SearchAgentDTO): Promise<boolean> {
+        const { url } = safeJsonParse<UseCurlConsume>(state.llMOutput.content);
+
         if (!state.permissions.has("INTERNET")) {
             const prompt = (
                 "Para conseguir continuar preciso fazer a busca em uma pagina da internet: \n" +
-                `${state.llMOutput.content}\n` +
+                chalk.italic.underline(`${url}\n`) +
                 "Tenho permissão para fazer isso? (y/n)"
             )
 

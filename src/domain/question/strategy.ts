@@ -7,6 +7,7 @@ import { ERROR_MESSAGE } from "@/src/config";
 import { AnswerTypeDescription } from "@/src/domain/core/types/answerType";
 import { agentQuestionPrompt } from "./prompt";
 import { safeJsonParse } from "@/src/utils/safeParser";
+import { secureExec } from "@/src/utils/secureExec";
 
 
 export class QuestionAgentStrategy {
@@ -41,12 +42,9 @@ export class QuestionAgentStrategy {
     }
 
     async parseOutput(output: string): Promise<QuestionAgentDTO> {
-        try {
+        return secureExec(() => {
             const rawParsedOutput = safeJsonParse<QuestionAgentDTO>(output);
-            const parser = QuestionAgent.parse(rawParsedOutput) as QuestionAgentDTO;
-            return parser;
-        } catch (error: any) {
-            throw new Error(ERROR_MESSAGE.FAIL_TO_PARSE);
-        }
+            return QuestionAgent.parse(rawParsedOutput) as QuestionAgentDTO;
+        }, ERROR_MESSAGE.FAIL_TO_PARSE);
     }
 }

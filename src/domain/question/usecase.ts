@@ -1,12 +1,13 @@
 import type { IVectorStore } from "@/src/infra/interfaces/vector.repository";
 import type { QuestionAgentStrategy } from "@/src/domain/question/strategy";
 import type { RetryPolicy } from "@langchain/langgraph";
-import { ERROR_TYPE } from "@/src/config";
+import { ERROR_MESSAGE, ERROR_TYPE } from "@/src/config";
 import type { QuestionAgentDTO } from "@/src/domain/question/models";
 import { MULTI_AGENT_SOURCE_VARS } from "@/src/domain/core/types/source";
 import { MULTI_AGENT_STEPS } from "@/src/domain/core/types/steps";
 import type { MultiAgentDTO } from "@/src/domain/core/types/dto";
 import { logger } from "@/src/tools/logger";
+import { secureExec, secureExecAsync } from "@/src/utils/secureExec";
 
 export class QuestionAgentUsecase {
     public readonly boundCallNode;
@@ -23,12 +24,22 @@ export class QuestionAgentUsecase {
     }
 
     private async execute(input: string): Promise<QuestionAgentDTO> {
-        const similarData = await this.vectorStore.similaritySearch(input, 3);
-        const context = similarData.map(data => data.pageContent).join('\n');
-        const prompt = await this.questionAgentStrategy.formatQuestionPrompt(input, context);
-        const rawResponse = await this.questionAgentStrategy.sendToModel(prompt);
-        const output = await this.questionAgentStrategy.parseOutput(rawResponse);
-        return output;
+        const context = await secureExecAsync(async () => {
+            const similarData = await this.vectorStore.similaritySearch(input, 3);
+            return similarData.map(data => data.pageContent).join('\n');
+        }, ERROR_MESSAGE.FAIL_IN_RAG);
+
+        const prompt = await secureExecAsync(() => (
+            this.questionAgentStrategy.formatQuestionPrompt(input, context)
+        ), ERROR_MESSAGE.FAIL_TO_CREATE_PROMPT);
+        
+        const rawResponse = await secureExecAsync(() => (
+            this.questionAgentStrategy.sendToModel(prompt)
+        ), ERROR_MESSAGE.NO_OUTPUT);
+
+        return await secureExecAsync(() => (
+            this.questionAgentStrategy.parseOutput(rawResponse)
+        ), ERROR_MESSAGE.FAIL_TO_PARSE);
     }
 
     async callNode(state: MultiAgentDTO): Promise<MultiAgentDTO> {
@@ -44,8 +55,9 @@ export class QuestionAgentUsecase {
             logger.state(newState);
 
             return newState;
-        } catch (error: any) {
-            throw Error(error.message || "An error occurred while processing the question.");
+        } catch (err) {
+            const error = err as Error;
+            throw new Error(`Erro ao chamar o nó <QuestionAgent> {${error.message}}`);
         }
     }
 
