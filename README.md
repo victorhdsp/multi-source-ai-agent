@@ -1,84 +1,109 @@
-# Multi-Source AI Agent Challenge
+# Agente de IA Multi-Fonte
 
-## Challenge Overview
+## Visão Geral
 
-Welcome to the Multi-Source AI Agent Challenge! In this project, you'll build an intelligent agent using Node.js and modern LLM frameworks that can answer questions by leveraging multiple data sources including SQLite databases, document files, and web content via bash commands.
+Este projeto é um agente de IA inteligente construído com Node.js, Bun e TypeScript, utilizando frameworks de LLM como LangChain.js e LangGraph. O agente é capaz de responder a perguntas e executar tarefas complexas, utilizando múltiplas fontes de dados, como bancos de dados SQLite, documentos de texto e conteúdo da web.
 
-## Challenge Requirements
+O objetivo é criar um assistente robusto que possa ser acessado via terminal, entender as necessidades do usuário, buscar informações de forma autônoma e executar ações com a devida permissão.
 
-### Technology Stack
-- Node.js
-- [LangChain](https://js.langchain.com/docs/) - For LLM integration and chains
-- [LangGraph](https://js.langchain.com/docs/langgraph/) - For agent workflow orchestration
+## Tecnologias Utilizadas
 
-### Core Features
-Your AI agent must be able to:
+- **Runtime:** Bun
+- **Linguagem:** TypeScript
+- **Integração com LLM:** LangChain.js
+- **Orquestração de Fluxo:** LangGraph.js
+- **Modelo de Linguagem:** Google Gemini (Flash e Pro)
+- **Banco de Vetores:** HNSWLib (via LangChain)
 
-1. **Answer questions using multiple data sources:**
-   - **SQLite databases**: The agent should query `.db` files placed in the `data/sqlite` folder
-   - **Document context**: The agent should extract information from `.txt` files in the `data/documents` folder
-   - **External data**: The agent should be able to run bash commands (with user approval) to gather additional data (e.g., using `curl` to fetch web content)
+## Funcionalidades Principais
 
-2. **Implement a conversational interface** - either in the browser or terminal
+1.  **Respostas a partir de Múltiplas Fontes:**
+    -   **Bancos de Dados SQLite:** O agente consulta arquivos `.db` localizados na pasta `data/sqlite`. Ele gera e utiliza metadados sobre os esquemas do banco de dados para construir consultas SQL de forma autônoma.
+    -   **Contexto de Documentos:** Extrai informações de arquivos `.txt` e `.pdf` na pasta `data/documents`, utilizando um banco de dados vetorial para realizar buscas semânticas (RAG).
+    -   **Dados Externos:** Executa comandos `curl` para buscar informações na web, sempre solicitando a aprovação do usuário.
+    -   **Interação com o Usuário:** Pode fazer perguntas diretas ao usuário para obter informações que não podem ser encontradas em outras fontes (ex: nomes de arquivos, preferências, etc.).
 
-3. **Provide intelligent routing** - decide which data source is most appropriate for each question and use the right tools accordingly
+2.  **Interface Conversacional:** A interação com o agente é feita através do terminal.
 
-### Minimum Viable Product
-Your solution must demonstrate:
+3.  **Roteamento Inteligente:** O agente decide qual a fonte de dados ou ferramenta mais apropriada para cada pergunta e orquestra o fluxo de trabalho para chegar à resposta final.
 
-- A functional agent that can respond to user questions
-- Proper routing between different data sources
-- A clear execution flow with user approval for bash commands
-- Meaningful responses that integrate information from multiple sources when needed
+4.  **Execução de Tarefas:** Para solicitações que exigem múltiplos passos (ex: "crie um arquivo e escreva um resumo nele"), o agente monta um plano de ação e pede permissão ao usuário antes de executá-lo.
 
-## Submission Guidelines
+## Arquitetura
 
-1. Fork this repository
-2. Implement your solution
-3. Submit a pull request with your implementation
-4. Include detailed instructions on how to run and test your solution
-5. Your code must be 100% functional
+O fluxo de trabalho do agente é dividido em três blocos principais, orquestrados por um grafo de estados (StateGraph).
 
-## Evaluation Criteria
+```mermaid
+flowchart LR
+    question_block((Bloco de Perguntas))
+    search_block((Bloco de Pesquisa))
+    response_block((Bloco de Respostas))
 
-Your submission will be evaluated based on:
+    question_block --> search_block
+    search_block --> response_block
+```
 
-- **Functionality**: Does it work as expected? Can it correctly use all three data sources?
-- **Code Quality**: Is the code well-organized, commented, and following best practices?
-- **Error Handling**: How does the agent handle edge cases and errors?
-- **User Experience**: Is the conversation with the agent natural and helpful?
-- **Documentation**: Is the setup and usage well documented?
+1.  **Bloco de Perguntas:** Recebe a entrada do usuário, busca informações relevantes em documentos vetorizados e decide se a solicitação é uma pergunta direta ou uma tarefa. Se a informação for suficiente, ele gera a resposta. Caso contrário, define quais informações estão faltando.
 
-## Setup Instructions
+2.  **Bloco de Pesquisa:** Se informações adicionais forem necessárias, este bloco é ativado. Ele utiliza um sub-agente com um conjunto de ferramentas (`SQLite`, `Curl`, `Perguntar ao Usuário`) para buscar os dados faltantes de forma iterativa.
 
-Include detailed instructions on how to set up and run your solution. For example:
+3.  **Bloco de Respostas:** Com todas as informações em mãos, este bloco formata a resposta final. Se for uma tarefa, ele apresenta o plano de execução e solicita a aprovação do usuário antes de agir.
 
-1. Clone the repository
-2. Install dependencies: `npm install`
-3. Configure environment variables (copy `.env.example` to `.env` and fill in required values)
-4. Add sample databases to the `sqlite` folder
-5. Add sample documents to the `documents` folder
-6. Start the agent: `npm start`
+## Como Executar
 
-## Testing Your Implementation
+1.  **Clone o repositório:**
+    ```bash
+    git clone <url-do-repositorio>
+    cd skip
+    ```
 
-Your README should include instructions on how to test the agent functionality, such as:
+2.  **Instale as dependências:**
+    ```bash
+    bun install
+    ```
 
-1. Sample questions that query SQLite databases
-2. Sample questions that require document context
-3. Sample questions that would trigger bash commands (and how to approve them)
-4. Examples of questions that combine multiple data sources
+3.  **Configure as variáveis de ambiente:**
+    -   Copie o arquivo de exemplo: `cp .env.example .env`
+    -   Adicione sua chave da API do Google no arquivo `.env`:
+        ```
+        GOOGLE_API_KEY="SUA_CHAVE_API"
+        ```
 
-## Resources
+4.  **Adicione seus dados (Opcional):**
+    -   Coloque arquivos de banco de dados SQLite (`.db`) na pasta `data/sqlite/`.
+    -   Coloque arquivos de texto (`.txt`) ou PDFs (`.pdf`) na pasta `data/documents/`.
 
-- [LangChain JS Documentation](https://js.langchain.com/docs/)
-- [LangGraph Documentation](https://js.langchain.com/docs/langgraph/)
-- [SQLite in Node.js Guide](https://www.sqlitetutorial.net/sqlite-nodejs/)
+5.  **Inicie o agente:**
+    ```bash
+    bun run dev
+    ```
+    > **Nota:** Ao iniciar, o agente verificará se existem novos documentos ou bancos de dados que ainda não foram processados (geração de metadados/embeddings). Ele perguntará se você deseja processá-los.
 
-## License
+## Como Testar
 
-This project is licensed under the MIT License - see the LICENSE file for details.
+Você pode fazer perguntas que explorem as diferentes capacidades do agente.
 
----
+1.  **Consulta ao Banco de Dados (usando `music.db`):**
+    -   `"Quais os álbuns do artista 'Accept'?"`
+    -   `"Liste os nomes dos funcionários que moram em Calgary."`
 
-Good luck with your implementation! We're excited to see your creative solutions to this challenge.
+2.  **Consulta a Documentos (usando `economy_books.txt`):**
+    -   `"Faça um resumo sobre o livro de economia."`
+    -   `"Quais os principais tópicos abordados no documento sobre economia?"`
+
+3.  **Comando Externo (Curl):**
+    -   `"Qual a capital da França?"`
+    -   `"Qual a previsão do tempo para São Paulo amanhã?"`
+
+4.  **Execução de Tarefa:**
+    -   `"Crie um arquivo chamado 'artistas.txt' e liste todos os nomes de artistas do banco de dados nele."`
+
+## Recursos
+
+-   [LangChain JS Documentation](https://js.langchain.com/docs/)
+-   [LangGraph Documentation](https://js.langchain.com/docs/langgraph/)
+-   [Google AI for Developers](https://ai.google.dev/)
+
+## Licença
+
+Este projeto está licenciado sob a Licença MIT - veja o arquivo [LICENSE](LICENSE) para mais detalhes.
