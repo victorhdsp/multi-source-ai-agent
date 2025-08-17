@@ -21,7 +21,8 @@ export const agentSearchPrompt: BaseMessagePromptTemplateLike[] = [
 export function useTools(toolBox: DynamicStructuredTool[]): BaseMessagePromptTemplateLike[] {
     const tools = toolBox.map(tool => {
         const schema = (toJsonSchema(tool.schema) as any).properties;
-        return `Nome da ferramenta: ${tool.name}, Descrição da ferramenta e como usar: ${tool.description}, Schema do input esperado pela ferramenta: ${schema}`;
+        const schemaString = ("```json\n" + JSON.stringify(schema, null, 2) + "\n```").replaceAll(/{|}/g, "|");
+        return `Nome da ferramenta: ${tool.name}, Descrição da ferramenta e como usar: ${tool.description}, Schema do input esperado pela ferramenta: ${schemaString}`;
     }).join("\n");
 
     const prompt: BaseMessagePromptTemplateLike[] = [
@@ -29,6 +30,7 @@ export function useTools(toolBox: DynamicStructuredTool[]): BaseMessagePromptTem
         { role: "user", content: tools },
         { role: "user", content: "Para utilizar essas ferramentas, seguindo o schema, você deve marcar o step correspondente e o content deve ser uma string contendo o schema de parâmetros." }
     ];
+
     return prompt;
 }
 

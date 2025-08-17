@@ -1,0 +1,700 @@
+{
+  "database": "music.db",
+  "tables": {
+    "Album": {
+      "columns": {
+        "AlbumId": {
+          "sample_values": [
+            1,
+            2,
+            3,
+            4,
+            5
+          ],
+          "description": "Identificador único do álbum."
+        },
+        "Title": {
+          "sample_values": [
+            "For Those About To Rock We Salute You",
+            "Balls to the Wall",
+            "Restless and Wild",
+            "Let There Be Rock",
+            "Big Ones"
+          ],
+          "description": "Título do álbum."
+        },
+        "ArtistId": {
+          "sample_values": [
+            1,
+            2,
+            2,
+            1,
+            3
+          ],
+          "description": "Identificador do artista associado ao álbum (chave estrangeira para a tabela Artist)."
+        }
+      },
+      "table_description": "Armazena informações sobre os álbuns de música."
+    },
+    "Artist": {
+      "columns": {
+        "ArtistId": {
+          "sample_values": [
+            1,
+            2,
+            3,
+            4,
+            5
+          ],
+          "description": "Identificador único do artista."
+        },
+        "Name": {
+          "sample_values": [
+            "AC/DC",
+            "Accept",
+            "Aerosmith",
+            "Alanis Morissette",
+            "Alice In Chains"
+          ],
+          "description": "Nome do artista."
+        }
+      },
+      "table_description": "Armazena informações sobre os artistas musicais."
+    },
+    "Customer": {
+      "columns": {
+        "CustomerId": {
+          "sample_values": [
+            1,
+            2,
+            3,
+            4,
+            5
+          ],
+          "description": "Identificador único do cliente."
+        },
+        "FirstName": {
+          "sample_values": [
+            "Luís",
+            "Leonie",
+            "François",
+            "Bjørn",
+            "František"
+          ],
+          "description": "Primeiro nome do cliente."
+        },
+        "LastName": {
+          "sample_values": [
+            "Gonçalves",
+            "Köhler",
+            "Tremblay",
+            "Hansen",
+            "Wichterlová"
+          ],
+          "description": "Sobrenome do cliente."
+        },
+        "Company": {
+          "sample_values": [
+            "Embraer - Empresa Brasileira de Aeronáutica S.A.",
+            null,
+            null,
+            null,
+            "JetBrains s.r.o."
+          ],
+          "description": "Nome da empresa do cliente, se aplicável."
+        },
+        "Address": {
+          "sample_values": [
+            "Av. Brigadeiro Faria Lima, 2170",
+            "Theodor-Heuss-Straße 34",
+            "1498 rue Bélanger",
+            "Ullevålsveien 14",
+            "Klanova 9/506"
+          ],
+          "description": "Endereço do cliente."
+        },
+        "City": {
+          "sample_values": [
+            "São José dos Campos",
+            "Stuttgart",
+            "Montréal",
+            "Oslo",
+            "Prague"
+          ],
+          "description": "Cidade do cliente."
+        },
+        "State": {
+          "sample_values": [
+            "SP",
+            null,
+            "QC",
+            null,
+            null
+          ],
+          "description": "Estado ou província do cliente."
+        },
+        "Country": {
+          "sample_values": [
+            "Brazil",
+            "Germany",
+            "Canada",
+            "Norway",
+            "Czech Republic"
+          ],
+          "description": "País do cliente."
+        },
+        "PostalCode": {
+          "sample_values": [
+            "12227-000",
+            "70174",
+            "H2G 1A7",
+            "0171",
+            "14700"
+          ],
+          "description": "Código postal do cliente."
+        },
+        "Phone": {
+          "sample_values": [
+            "+55 (12) 3923-5555",
+            "+49 0711 2842222",
+            "+1 (514) 721-4711",
+            "+47 22 44 22 22",
+            "+420 2 4172 5555"
+          ],
+          "description": "Número de telefone do cliente."
+        },
+        "Fax": {
+          "sample_values": [
+            "+55 (12) 3923-5566",
+            null,
+            null,
+            null,
+            "+420 2 4172 5555"
+          ],
+          "description": "Número de fax do cliente, se aplicável."
+        },
+        "Email": {
+          "sample_values": [
+            "luisg@embraer.com.br",
+            "leonekohler@surfeu.de",
+            "ftremblay@gmail.com",
+            "bjorn.hansen@yahoo.no",
+            "frantisekw@jetbrains.com"
+          ],
+          "description": "Endereço de e-mail do cliente."
+        },
+        "SupportRepId": {
+          "sample_values": [
+            3,
+            5,
+            3,
+            4,
+            4
+          ],
+          "description": "Identificador do representante de suporte do cliente (chave estrangeira para a tabela Employee)."
+        }
+      },
+      "table_description": "Armazena informações detalhadas sobre os clientes."
+    },
+    "Employee": {
+      "columns": {
+        "EmployeeId": {
+          "sample_values": [
+            1,
+            2,
+            3,
+            4,
+            5
+          ],
+          "description": "Identificador único do funcionário."
+        },
+        "LastName": {
+          "sample_values": [
+            "Adams",
+            "Edwards",
+            "Peacock",
+            "Park",
+            "Johnson"
+          ],
+          "description": "Sobrenome do funcionário."
+        },
+        "FirstName": {
+          "sample_values": [
+            "Andrew",
+            "Nancy",
+            "Jane",
+            "Margaret",
+            "Steve"
+          ],
+          "description": "Primeiro nome do funcionário."
+        },
+        "Title": {
+          "sample_values": [
+            "General Manager",
+            "Sales Manager",
+            "Sales Support Agent",
+            "Sales Support Agent",
+            "Sales Support Agent"
+          ],
+          "description": "Cargo do funcionário."
+        },
+        "ReportsTo": {
+          "sample_values": [
+            null,
+            1,
+            2,
+            2,
+            2
+          ],
+          "description": "Identificador do gerente para quem o funcionário se reporta (chave estrangeira auto-referenciada)."
+        },
+        "BirthDate": {
+          "sample_values": [
+            "1962-02-18 00:00:00",
+            "1958-12-08 00:00:00",
+            "1973-08-29 00:00:00",
+            "1947-09-19 00:00:00",
+            "1965-03-03 00:00:00"
+          ],
+          "description": "Data de nascimento do funcionário."
+        },
+        "HireDate": {
+          "sample_values": [
+            "2002-08-14 00:00:00",
+            "2002-05-01 00:00:00",
+            "2002-04-01 00:00:00",
+            "2003-05-03 00:00:00",
+            "2003-10-17 00:00:00"
+          ],
+          "description": "Data de contratação do funcionário."
+        },
+        "Address": {
+          "sample_values": [
+            "11120 Jasper Ave NW",
+            "825 8 Ave SW",
+            "1111 6 Ave SW",
+            "683 10 Street SW",
+            "7727B 41 Ave"
+          ],
+          "description": "Endereço do funcionário."
+        },
+        "City": {
+          "sample_values": [
+            "Edmonton",
+            "Calgary",
+            "Calgary",
+            "Calgary",
+            "Calgary"
+          ],
+          "description": "Cidade do funcionário."
+        },
+        "State": {
+          "sample_values": [
+            "AB",
+            "AB",
+            "AB",
+            "AB",
+            "AB"
+          ],
+          "description": "Estado ou província do funcionário."
+        },
+        "Country": {
+          "sample_values": [
+            "Canada",
+            "Canada",
+            "Canada",
+            "Canada",
+            "Canada"
+          ],
+          "description": "País do funcionário."
+        },
+        "PostalCode": {
+          "sample_values": [
+            "T5K 2N1",
+            "T2P 2T3",
+            "T2P 5M5",
+            "T2P 5G3",
+            "T3B 1Y7"
+          ],
+          "description": "Código postal do funcionário."
+        },
+        "Phone": {
+          "sample_values": [
+            "+1 (780) 428-9482",
+            "+1 (403) 262-3443",
+            "+1 (403) 262-3443",
+            "+1 (403) 263-4423",
+            "1 (780) 836-9987"
+          ],
+          "description": "Número de telefone do funcionário."
+        },
+        "Fax": {
+          "sample_values": [
+            "+1 (780) 428-3457",
+            "+1 (403) 262-3322",
+            "+1 (403) 262-6712",
+            "+1 (403) 263-4289",
+            "1 (780) 836-9543"
+          ],
+          "description": "Número de fax do funcionário."
+        },
+        "Email": {
+          "sample_values": [
+            "andrew@chinookcorp.com",
+            "nancy@chinookcorp.com",
+            "jane@chinookcorp.com",
+            "margaret@chinookcorp.com",
+            "steve@chinookcorp.com"
+          ],
+          "description": "Endereço de e-mail do funcionário."
+        }
+      },
+      "table_description": "Armazena informações sobre os funcionários da empresa."
+    },
+    "Genre": {
+      "columns": {
+        "GenreId": {
+          "sample_values": [
+            1,
+            2,
+            3,
+            4,
+            5
+          ],
+          "description": "Identificador único do gênero musical."
+        },
+        "Name": {
+          "sample_values": [
+            "Rock",
+            "Jazz",
+            "Metal",
+            "Alternative & Punk",
+            "Rock And Roll"
+          ],
+          "description": "Nome do gênero musical."
+        }
+      },
+      "table_description": "Armazena informações sobre os gêneros musicais."
+    },
+    "Invoice": {
+      "columns": {
+        "InvoiceId": {
+          "sample_values": [
+            1,
+            2,
+            3,
+            4,
+            5
+          ],
+          "description": "Identificador único da fatura."
+        },
+        "CustomerId": {
+          "sample_values": [
+            2,
+            4,
+            8,
+            14,
+            23
+          ],
+          "description": "Identificador do cliente associado à fatura (chave estrangeira para a tabela Customer)."
+        },
+        "InvoiceDate": {
+          "sample_values": [
+            "2009-01-01 00:00:00",
+            "2009-01-02 00:00:00",
+            "2009-01-03 00:00:00",
+            "2009-01-06 00:00:00",
+            "2009-01-11 00:00:00"
+          ],
+          "description": "Data e hora de emissão da fatura."
+        },
+        "BillingAddress": {
+          "sample_values": [
+            "Theodor-Heuss-Straße 34",
+            "Ullevålsveien 14",
+            "Grétrystraat 63",
+            "8210 111 ST NW",
+            "69 Salem Street"
+          ],
+          "description": "Endereço de cobrança da fatura."
+        },
+        "BillingCity": {
+          "sample_values": [
+            "Stuttgart",
+            "Oslo",
+            "Brussels",
+            "Edmonton",
+            "Boston"
+          ],
+          "description": "Cidade de cobrança da fatura."
+        },
+        "BillingState": {
+          "sample_values": [
+            null,
+            null,
+            null,
+            "AB",
+            "MA"
+          ],
+          "description": "Estado ou província de cobrança da fatura."
+        },
+        "BillingCountry": {
+          "sample_values": [
+            "Germany",
+            "Norway",
+            "Belgium",
+            "Canada",
+            "USA"
+          ],
+          "description": "País de cobrança da fatura."
+        },
+        "BillingPostalCode": {
+          "sample_values": [
+            "70174",
+            "0171",
+            "1000",
+            "T6G 2C7",
+            "2113"
+          ],
+          "description": "Código postal de cobrança da fatura."
+        },
+        "Total": {
+          "sample_values": [
+            1.98,
+            3.96,
+            5.94,
+            8.91,
+            13.86
+          ],
+          "description": "Valor total da fatura."
+        }
+      },
+      "table_description": "Armazena informações sobre as faturas dos clientes."
+    },
+    "InvoiceLine": {
+      "columns": {
+        "InvoiceLineId": {
+          "sample_values": [
+            1,
+            2,
+            3,
+            4,
+            5
+          ],
+          "description": "Identificador único da linha de item da fatura."
+        },
+        "InvoiceId": {
+          "sample_values": [
+            1,
+            1,
+            2,
+            2,
+            2
+          ],
+          "description": "Identificador da fatura à qual a linha de item pertence (chave estrangeira para a tabela Invoice)."
+        },
+        "TrackId": {
+          "sample_values": [
+            2,
+            4,
+            6,
+            8,
+            10
+          ],
+          "description": "Identificador da faixa de música comprada (chave estrangeira para a tabela Track)."
+        },
+        "UnitPrice": {
+          "sample_values": [
+            0.99,
+            0.99,
+            0.99,
+            0.99,
+            0.99
+          ],
+          "description": "Preço unitário da faixa no momento da compra."
+        },
+        "Quantity": {
+          "sample_values": [
+            1,
+            1,
+            1,
+            1,
+            1
+          ],
+          "description": "Quantidade da faixa comprada."
+        }
+      },
+      "table_description": "Armazena os itens individuais de cada fatura."
+    },
+    "MediaType": {
+      "columns": {
+        "MediaTypeId": {
+          "sample_values": [
+            1,
+            2,
+            3,
+            4,
+            5
+          ],
+          "description": "Identificador único do tipo de mídia."
+        },
+        "Name": {
+          "sample_values": [
+            "MPEG audio file",
+            "Protected AAC audio file",
+            "Protected MPEG-4 video file",
+            "Purchased AAC audio file",
+            "AAC audio file"
+          ],
+          "description": "Nome do tipo de mídia (ex: arquivo de áudio MPEG)."
+        }
+      },
+      "table_description": "Armazena informações sobre os diferentes tipos de mídia para as faixas."
+    },
+    "Playlist": {
+      "columns": {
+        "PlaylistId": {
+          "sample_values": [
+            1,
+            2,
+            3,
+            4,
+            5
+          ],
+          "description": "Identificador único da playlist."
+        },
+        "Name": {
+          "sample_values": [
+            "Music",
+            "Movies",
+            "TV Shows",
+            "Audiobooks",
+            "90’s Music"
+          ],
+          "description": "Nome da playlist."
+        }
+      },
+      "table_description": "Armazena informações sobre as playlists de música."
+    },
+    "PlaylistTrack": {
+      "columns": {
+        "PlaylistId": {
+          "sample_values": [
+            1,
+            1,
+            1,
+            1,
+            1
+          ],
+          "description": "Identificador da playlist (chave estrangeira para a tabela Playlist)."
+        },
+        "TrackId": {
+          "sample_values": [
+            3402,
+            3389,
+            3390,
+            3391,
+            3392
+          ],
+          "description": "Identificador da faixa de música (chave estrangeira para a tabela Track)."
+        }
+      },
+      "table_description": "Associa faixas a playlists, representando uma relação muitos-para-muitos."
+    },
+    "Track": {
+      "columns": {
+        "TrackId": {
+          "sample_values": [
+            1,
+            2,
+            3,
+            4,
+            5
+          ],
+          "description": "Identificador único da faixa de música."
+        },
+        "Name": {
+          "sample_values": [
+            "For Those About To Rock (We Salute You)",
+            "Balls to the Wall",
+            "Fast As a Shark",
+            "Restless and Wild",
+            "Princess of the Dawn"
+          ],
+          "description": "Nome da faixa de música."
+        },
+        "AlbumId": {
+          "sample_values": [
+            1,
+            2,
+            3,
+            3,
+            3
+          ],
+          "description": "Identificador do álbum ao qual a faixa pertence (chave estrangeira para a tabela Album)."
+        },
+        "MediaTypeId": {
+          "sample_values": [
+            1,
+            2,
+            2,
+            2,
+            2
+          ],
+          "description": "Identificador do tipo de mídia da faixa (chave estrangeira para a tabela MediaType)."
+        },
+        "GenreId": {
+          "sample_values": [
+            1,
+            1,
+            1,
+            1,
+            1
+          ],
+          "description": "Identificador do gênero musical da faixa (chave estrangeira para a tabela Genre)."
+        },
+        "Composer": {
+          "sample_values": [
+            "Angus Young, Malcolm Young, Brian Johnson",
+            null,
+            "F. Baltes, S. Kaufman, U. Dirkscneider & W. Hoffman",
+            "F. Baltes, R.A. Smith-Diesel, S. Kaufman, U. Dirkscneider & W. Hoffman",
+            "Deaffy & R.A. Smith-Diesel"
+          ],
+          "description": "Nome(s) do(s) compositor(es) da faixa."
+        },
+        "Milliseconds": {
+          "sample_values": [
+            343719,
+            342562,
+            230619,
+            252051,
+            375418
+          ],
+          "description": "Duração da faixa em milissegundos."
+        },
+        "Bytes": {
+          "sample_values": [
+            11170334,
+            5510424,
+            3990994,
+            4331779,
+            6290521
+          ],
+          "description": "Tamanho da faixa em bytes."
+        },
+        "UnitPrice": {
+          "sample_values": [
+            0.99,
+            0.99,
+            0.99,
+            0.99,
+            0.99
+          ],
+          "description": "Preço unitário da faixa."
+        }
+      },
+      "table_description": "Armazena informações detalhadas sobre as faixas de música individuais."
+    }
+  }
+}

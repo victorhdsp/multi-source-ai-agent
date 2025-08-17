@@ -10,6 +10,7 @@ import { ERROR_MESSAGE, SQL_METADATA_PATH } from "@/src/config";
 import { SEARCH_AGENT_STEPS } from "../../selfAskWithSearch/types/steps";
 import { databaseMetadataSchema } from "@/src/domain/core/types/databaseMetadata";
 import type { SearchAgentDTO } from "../../selfAskWithSearch/types/dto";
+import { safeJsonParse } from "@/src/utils/safeParser";
 
 interface UseSqliteTraitment {
     path: string;
@@ -25,7 +26,7 @@ export class UseSQLiteTool implements ITool<UseSQLiteConsume, UseSqliteTraitment
 
     private getSpecificDBDescription(pathURL: string): string {
         const rawMetadata = fs.readFileSync(pathURL, { encoding: "utf-8" });
-        const metadata = databaseMetadataSchema.parse(JSON.parse(rawMetadata));
+        const metadata = databaseMetadataSchema.parse(safeJsonParse(rawMetadata));
 
         let description = "Nome do banco de dados: " + metadata.database + "\n";
         description += `Path: ${path.join(SQL_METADATA_PATH, metadata.database)}\n`;
@@ -48,7 +49,7 @@ export class UseSQLiteTool implements ITool<UseSQLiteConsume, UseSqliteTraitment
         }).join("\n\n");
 
         return {
-            name: SEARCH_AGENT_STEPS.GET_MUSIC_DB,
+            name: SEARCH_AGENT_STEPS.USE_SQL,
             description: (
                 "Consulta dados no banco de dados SQLite" +
                 `Você tem acesso ao seguinte banco de dados:\n` +
@@ -100,7 +101,7 @@ export class UseSQLiteTool implements ITool<UseSQLiteConsume, UseSqliteTraitment
             return rawConsult;
 
         } catch (error) {
-            logger.error(`Erro ao consultar banco de dados: ${error}`);
+            logger.error(`[useSQLite] Erro ao consultar banco de dados: ${error}`);
             return ERROR_MESSAGE.NO_ACCESS_TO_DB(params.table, params.path);
         }
     }
@@ -118,7 +119,7 @@ export class UseSQLiteTool implements ITool<UseSQLiteConsume, UseSqliteTraitment
 
     async useNode(state: SearchAgentDTO): Promise<SearchAgentDTO> {
         try {
-            const rawStateContent = JSON.parse(state.llMOutput.content);
+            const rawStateContent = safeJsonParse<UseSQLiteConsume>(state.llMOutput.content);
             const { path, table, columns, filters } = useSQLiteConsume.parse(rawStateContent);
 
             const userInput = state.userInput;
@@ -139,7 +140,7 @@ export class UseSQLiteTool implements ITool<UseSQLiteConsume, UseSqliteTraitment
             return newState;
         } catch (err) {
             const error = err as Error;
-            logger.error(error.message);
+            logger.error("[useSQLite] (useNode):", error.message);
             return { ...state, error: error.message };
         }
     }

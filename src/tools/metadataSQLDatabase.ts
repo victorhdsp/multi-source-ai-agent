@@ -8,6 +8,7 @@ import { toJsonSchema } from "@langchain/core/utils/json_schema";
 import { logger } from "./logger";
 import { databaseMetadataSchema } from "../domain/core/types/databaseMetadata";
 import type z from "zod";
+import { safeJsonParse } from "../utils/safeParser";
 
 type Metadata = z.infer<typeof databaseMetadataSchema>;
 
@@ -77,8 +78,7 @@ export class DBMetadataService {
     private async metadataSchema(metadata: Metadata): Promise<Metadata> {
         const chain = this.prompt.pipe(this.model);
         const rawResult = await chain.invoke({ database: metadata, format_instructions: JSON.stringify(this.format) });
-        const resultString = rawResult.text.replace("```json", "").replace("```", "")
-        const rawParsedResult = JSON.parse(resultString);
+        const rawParsedResult = safeJsonParse<Metadata>(rawResult.text);
         return databaseMetadataSchema.parse(rawParsedResult);
     }
 
@@ -105,7 +105,7 @@ export class DBMetadataService {
             return neededFiles;
 
         } catch (error) {
-            logger.error("Error reading database files:", error);
+            logger.error("[DBMetadataService] Error reading database files:", error);
             return [];
         }
     }
@@ -120,7 +120,7 @@ export class DBMetadataService {
                 try {
                     await this.executeUnique(dbPath);
                 } catch (error) {
-                    logger.error(`Error processing ${file}:`, error);
+                    logger.error(`[DBMetadataService] Error processing ${file}:`, error);
                 }
             }
         };

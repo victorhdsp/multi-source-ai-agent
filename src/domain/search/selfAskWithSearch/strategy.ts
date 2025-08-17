@@ -7,6 +7,7 @@ import { logger } from "@/src/tools/logger";
 import { formatAgentPrompt, useTools } from "./prompt";
 import type { ToolBoxService } from "../tool/service";
 import type { BaseMessagePromptTemplateLike } from "@langchain/core/prompts";
+import { safeJsonParse } from "@/src/utils/safeParser";
 
 export class SelfAskWithSearchStrategy {
     public readonly boundCallNode;
@@ -27,20 +28,18 @@ export class SelfAskWithSearchStrategy {
         if (this.model.bindTools) {
             this.model.bindTools(tools);
         } else {
-            logger.error(ERROR_MESSAGE.NOT_SUPPORT_BIND_TOOLS);
+            logger.error("[SelfAskWithSearch] (init):", ERROR_MESSAGE.NOT_SUPPORT_BIND_TOOLS);
             this.tools = useTools(tools);
         }
     }
 
     async callNode(state: SearchAgentDTO): Promise<SearchAgentDTO> {
         const prompt = await formatAgentPrompt(state, this.tools);
-        
         const chain = prompt.pipe(this.model)
         const chainResult = await chain.invoke({});
-        const rawContent = chainResult.text.replace("```json", "").replace("```", "");
 
         try {
-            const rawParsedOutput = JSON.parse(rawContent);
+            const rawParsedOutput = safeJsonParse<SelfAskDTO>(chainResult.text);
             rawParsedOutput.type = state.llMOutput.type;
             const output = selfAskState.parse(rawParsedOutput);
             
@@ -65,7 +64,7 @@ export class SelfAskWithSearchStrategy {
 
     async route(state: SearchAgentDTO): Promise<string> {
         if (state.error) {
-            logger.error(state.error);
+            logger.error("[SelfAskWithSearch] (Route):", state.error);
             return SEARCH_AGENT_STEPS.STOP;
         }
 

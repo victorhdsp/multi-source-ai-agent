@@ -8,9 +8,10 @@ import * as cheerio from 'cheerio';
 import type { EmbeddingService } from '@/src/infra/gateway/embedding.service';
 import type { IDocumentTool, ITool } from '../type';
 import type { SearchAgentDTO } from '../../selfAskWithSearch/types/dto';
-import type { PermissionManager } from '../permissions';
 import { persistentTalk } from '@/src/domain/core/interference/helper/persistentTalk';
-import { HUMAN_RESPONSE, INTERRUPT_TYPES } from '@/src/domain/core/types/human';
+import { HUMAN_RESPONSE, INTERRUPT_TYPES } from '@/src/domain/core/interference/type';
+import { SEARCH_AGENT_STEPS } from '../../selfAskWithSearch/types/steps';
+import { safeJsonParse } from '@/src/utils/safeParser';
 
 interface UseCurlTraitment {
     url: string;
@@ -26,8 +27,8 @@ export class UseCurlTool implements ITool<UseCurlConsume, UseCurlTraitment> {
 
     async getDoc(): Promise<IDocumentTool> {
         return {
-            name: "useCurl",
-            description: "A tool for making HTTP requests using curl",
+            name: SEARCH_AGENT_STEPS.USE_CURL,
+            description: "A ferramenta para fazer requisições HTTP utilizando curl",
             schema: useCurlConsume
         };
     }
@@ -71,7 +72,7 @@ export class UseCurlTool implements ITool<UseCurlConsume, UseCurlTraitment> {
     
         } catch (err) {
             const error = err as Error; 
-            logger.error(error.message);
+            logger.error("[useCurl] (execute):", error.message);
             return ERROR_MESSAGE.NO_ACCESS_TO_PAGE(params.url);
         }
     }
@@ -90,19 +91,20 @@ export class UseCurlTool implements ITool<UseCurlConsume, UseCurlTraitment> {
     
         } catch (err) {
             const error = err as Error;
-            logger.error(error.message);
+            logger.error("[useCurl] (traitResult):", error.message);
             return ERROR_MESSAGE.NO_ACCESS_TO_PAGE(url);
         }
     }
 
     async useNode(state: SearchAgentDTO): Promise<SearchAgentDTO> {
+        const hasPermission = await this.requestInternetPermission(state);
+        
         try {
-            const hasPermission = await this.requestInternetPermission(state);
             if (!hasPermission) throw new Error(ERROR_MESSAGE.NO_PERMISSION_TO_WEB_SEARCH);
             state.permissions.add("INTERNET");
 
             const userInput = state.userInput
-            const rawStateContent = JSON.parse(state.llMOutput.content)
+            const rawStateContent = safeJsonParse<UseCurlConsume>(state.llMOutput.content)
             const { url } = useCurlConsume.parse(rawStateContent);
 
             const tool = await this.getTool();
@@ -122,7 +124,7 @@ export class UseCurlTool implements ITool<UseCurlConsume, UseCurlTraitment> {
             return newState;
         } catch (err) {
             const error = err as Error;
-            logger.error(error.message);
+            logger.error("[useCurl] (useNode):", error.message);
             return { ...state, error: error.message };
         }
     }

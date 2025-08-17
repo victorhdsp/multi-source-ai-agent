@@ -2,7 +2,7 @@
 import { Command, END, type RetryPolicy } from "@langchain/langgraph";
 import { ERROR_MESSAGE} from "@/src/config";
 import type { MultiAgentDTO } from "@/src/domain/core/types/dto";
-import { HUMAN_RESPONSE, INTERRUPT_TYPES, type InterruptType } from "../types/human";
+import { HUMAN_RESPONSE, INTERRUPT_TYPES, type InterruptType } from "./type";
 import { persistentTalk } from "./helper/persistentTalk";
 
 export class CheckResultInterferenceUsecase {

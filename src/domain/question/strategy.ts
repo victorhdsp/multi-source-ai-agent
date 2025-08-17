@@ -6,6 +6,7 @@ import { QuestionAgent, type QuestionAgentDTO } from "@/src/domain/question/mode
 import { ERROR_MESSAGE } from "@/src/config";
 import { AnswerTypeDescription } from "@/src/domain/core/types/answerType";
 import { agentQuestionPrompt } from "./prompt";
+import { safeJsonParse } from "@/src/utils/safeParser";
 
 
 export class QuestionAgentStrategy {
@@ -40,10 +41,8 @@ export class QuestionAgentStrategy {
     }
 
     async parseOutput(output: string): Promise<QuestionAgentDTO> {
-        const rawContent = output.replace("```json", "").replace("```", "");
-        
         try {
-            const rawParsedOutput = JSON.parse(rawContent);
+            const rawParsedOutput = safeJsonParse<QuestionAgentDTO>(output);
             const parser = QuestionAgent.parse(rawParsedOutput) as QuestionAgentDTO;
             return parser;
         } catch (error: any) {

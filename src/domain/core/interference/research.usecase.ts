@@ -2,7 +2,7 @@ import { Command, type RetryPolicy } from "@langchain/langgraph";
 import { ERROR_MESSAGE } from "@/src/config";
 import type { MultiAgentDTO } from "@/src/domain/core/types/dto";
 import { persistentTalk } from "./helper/persistentTalk";
-import { HUMAN_RESPONSE, INTERRUPT_TYPES, type InterruptType } from "../types/human";
+import { HUMAN_RESPONSE, INTERRUPT_TYPES, type InterruptType } from "./type";
 
 export class ResearchInterferenceUsecase {
     async callNode(state: MultiAgentDTO): Promise<MultiAgentDTO> {
