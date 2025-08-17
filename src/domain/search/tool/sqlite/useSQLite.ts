@@ -6,9 +6,9 @@ import { useSQLiteConsume, type UseSQLiteConsume } from "./type";
 import { tool, type DynamicStructuredTool } from "@langchain/core/tools";
 import { logger } from "@/src/tools/logger";
 import type { FindDBService } from "./findDBService";
-import { ERROR_MESSAGE, SQL_METADATA_PATH } from "@/src/config";
+import { ERROR_MESSAGE, SQL_DATABASE_PATH, SQL_METADATA_PATH } from "@/src/config";
 import { SEARCH_AGENT_STEPS } from "../../selfAskWithSearch/types/steps";
-import { databaseMetadataSchema } from "@/src/domain/core/types/databaseMetadata";
+import { databaseMetadataSchema, type MetadataSchema } from "@/src/domain/core/types/databaseMetadata";
 import type { SearchAgentDTO } from "../../selfAskWithSearch/types/dto";
 import { safeJsonParse } from "@/src/utils/safeParser";
 
@@ -26,10 +26,11 @@ export class UseSQLiteTool implements ITool<UseSQLiteConsume, UseSqliteTraitment
 
     private getSpecificDBDescription(pathURL: string): string {
         const rawMetadata = fs.readFileSync(pathURL, { encoding: "utf-8" });
-        const metadata = databaseMetadataSchema.parse(safeJsonParse(rawMetadata));
+        const databaseMetadata = safeJsonParse<MetadataSchema>(rawMetadata);
+        const metadata = databaseMetadataSchema.parse(databaseMetadata);
 
         let description = "Nome do banco de dados: " + metadata.database + "\n";
-        description += `Path: ${path.join(SQL_METADATA_PATH, metadata.database)}\n`;
+        description += `Path: ${path.join(SQL_DATABASE_PATH, metadata.database)}\n`;
         for (const [tableName, tableInfo] of Object.entries(metadata.tables)) {
             description += `- ${tableName} -> ${tableInfo.table_description}\n`;
             for (const [columnName, columnInfo] of Object.entries(tableInfo.columns)) {
@@ -95,13 +96,14 @@ export class UseSQLiteTool implements ITool<UseSQLiteConsume, UseSqliteTraitment
                 `Filtros: ${params.filters}\n` +
                 `Colunas: ${params.columns?.join(", ") || "Todas"}\n` +
                 `Resultado:\n` +
-                rows.join("\n")
+                    rows.join("\n")
             )
 
             return rawConsult;
 
         } catch (error) {
             logger.error(`[useSQLite] Erro ao consultar banco de dados: ${error}`);
+            logger.errorState(error, "[useSQLite] - Execute");
             return ERROR_MESSAGE.NO_ACCESS_TO_DB(params.table, params.path);
         }
     }
@@ -121,7 +123,7 @@ export class UseSQLiteTool implements ITool<UseSQLiteConsume, UseSqliteTraitment
         try {
             const rawStateContent = safeJsonParse<UseSQLiteConsume>(state.llMOutput.content);
             const { path, table, columns, filters } = useSQLiteConsume.parse(rawStateContent);
-
+            
             const userInput = state.userInput;
             const tool = await this.getTool();
             const rawContent = await tool.invoke({ path, table, columns, filters });
@@ -141,6 +143,7 @@ export class UseSQLiteTool implements ITool<UseSQLiteConsume, UseSqliteTraitment
         } catch (err) {
             const error = err as Error;
             logger.error("[useSQLite] (useNode):", error.message);
+            logger.errorState(error.message, "[useSQLite] - UseNode");
             return { ...state, error: error.message };
         }
     }

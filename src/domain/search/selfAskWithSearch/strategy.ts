@@ -29,7 +29,7 @@ export class SelfAskWithSearchStrategy {
         if (this.model.bindTools) {
             this.model.bindTools(tools);
         } else {
-            logger.error("[SelfAskWithSearch] (init):", ERROR_MESSAGE.NOT_SUPPORT_BIND_TOOLS);
+            logger.warn("[SelfAskWithSearch] (init):", ERROR_MESSAGE.NOT_SUPPORT_BIND_TOOLS);
             this.tools = useTools(tools);
         }
     }
@@ -69,6 +69,7 @@ export class SelfAskWithSearchStrategy {
     async route(state: SearchAgentDTO): Promise<string> {
         if (state.error) {
             logger.error("[SelfAskWithSearch] (Route):", state.error);
+            logger.errorState(state.error, "[SelfAskWithSearch] - Route");
             return SEARCH_AGENT_STEPS.STOP;
         }
 
@@ -77,7 +78,7 @@ export class SelfAskWithSearchStrategy {
             return SEARCH_AGENT_STEPS.STOP;
         }
 
-        if (state.llMOutput.missing.length === 0) {
+        if (state.llMOutput.step === SEARCH_AGENT_STEPS.STOP) {
             logger.thinking("Já sei a resposta!");
             return SEARCH_AGENT_STEPS.STOP;
         }

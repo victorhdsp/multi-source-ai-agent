@@ -13,9 +13,10 @@ export const agentSearchPrompt: BaseMessagePromptTemplateLike[] = [
     { role: "user", content: "Caso olhando para as ferramentas disponíveis você ache que não vai conseguir obter a resposta, então retorne um erro, mas jamais responda sem ter uma informação precisa disponível." },
     { role: "user", content: "O histórico atual de informações é: {history}" },
     { role: "user", content: "Você vai receber uma lista de informações faltantes que devem ser importantes para resolver o problema, você pode adicionar novas informações que você julgar necessário, você tambem pode remover, porém apenas se no histórico tiver a informação que responda essa pergutna." },
-    { role: "user", content: "Esse é um schema feito no Zod que representa o formato da resposta, ela sempre deve seguir esse schema: {format_instructions}, dentro do schema tem `type` que não deve ser modficado, `step` é usado para que o cliente tenha noção do passo atual, porém eles tem valores específicos que são: {steps}, caso você consiga responder a pergunta utilize o step de WHATNOT e caso esteja resolvido mesmo que ainda tenha perguntas use o step de STOP." },
+    { role: "user", content: "Esse é um schema feito no Zod que representa o formato da resposta, ela sempre deve seguir esse schema: {format_instructions}, todos os campos são obrigatórios, dentro do schema tem `type` que não deve ser modficado, `step` é usado para que o cliente tenha noção do passo atual, porém eles tem valores específicos que são: {steps}, caso você consiga responder a pergunta utilize o step de WHATNOT e caso esteja resolvido mesmo que ainda tenha perguntas use o step de STOP." },
     { role: "user", content: "O problema do usuário é: {problem}" },
     { role: "user", content: "As informações faltantes são: {missing}" },
+    { role: "user", content: "As fontes que você já buscou são: {searched_sources}" }
 ]
 
 export function useTools(toolBox: DynamicStructuredTool[]): BaseMessagePromptTemplateLike[] {
@@ -57,6 +58,7 @@ export async function formatAgentPrompt(state: SearchAgentDTO, tools: BaseMessag
             steps: steps,
             problem: state.userInput,
             missing: state.llMOutput.missing.join(", "),
+            searched_sources: state.searchedSources.join(", ")
         });
 
     return prompt;

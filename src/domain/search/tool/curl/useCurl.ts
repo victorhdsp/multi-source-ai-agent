@@ -76,6 +76,7 @@ export class UseCurlTool implements ITool<UseCurlConsume, UseCurlTraitment> {
         } catch (err) {
             const error = err as Error; 
             logger.error("[useCurl] (execute):", error.message);
+            logger.errorState(error.message, "[useCurl] - Execute");
             return ERROR_MESSAGE.NO_ACCESS_TO_PAGE(params.url);
         }
     }
@@ -95,6 +96,7 @@ export class UseCurlTool implements ITool<UseCurlConsume, UseCurlTraitment> {
         } catch (err) {
             const error = err as Error;
             logger.error("[useCurl] (traitResult):", error.message);
+            logger.errorState(error.message, "[useCurl] - TraitResult");
             return ERROR_MESSAGE.NO_ACCESS_TO_PAGE(url);
         }
     }
@@ -128,6 +130,7 @@ export class UseCurlTool implements ITool<UseCurlConsume, UseCurlTraitment> {
         } catch (err) {
             const error = err as Error;
             logger.error("[useCurl] (useNode):", error.message);
+            logger.errorState(error.message, "[useCurl] - UseNode");
             return { ...state, error: error.message };
         }
     }

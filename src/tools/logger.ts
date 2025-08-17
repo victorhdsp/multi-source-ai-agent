@@ -36,6 +36,9 @@ export const logger = {
         stateCounter++;
         //console.log(chalk.italic.magenta(`   - Estado ${stateCounter}:`), message, ...optionalParams);
     },
+    errorState: (message?: any, ...optionalParams: any[]) => {
+        LogInFile(message, `\n - ERROR:\n-----\n`, '\n-----\n');
+    },
     talk: (message?: any, ...optionalParams: any[]) => {
         console.log(chalk.white(message), ...optionalParams);
     }

@@ -106,6 +106,7 @@ export class DBMetadataService {
 
         } catch (error) {
             logger.error("[DBMetadataService] Error reading database files:", error);
+            logger.errorState(error, "[DBMetadataService] - GetDBWithoutMetadata");
             return [];
         }
     }
@@ -120,7 +121,8 @@ export class DBMetadataService {
                 try {
                     await this.executeUnique(dbPath);
                 } catch (error) {
-                    logger.error(`[DBMetadataService] Error processing ${file}:`, error);
+                    logger.warn(`[DBMetadataService] Error processing ${file}:`, error);
+                    logger.errorState(error, `[DBMetadataService] - ExecuteUnique: ${file}`);
                 }
             }
         };

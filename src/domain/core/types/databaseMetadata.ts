@@ -12,3 +12,5 @@ export const databaseMetadataSchema = z.object({
     })
   )
 });
+
+export type MetadataSchema = z.infer<typeof databaseMetadataSchema>;

@@ -55,6 +55,7 @@ async function main() {
 
         } catch (err) {
             logger.error("[Entry] Erro:", err);
+            logger.errorState(err, "[Entry] - Readline");
         } finally {
             isProcessing = false;
             rlPrompt();
@@ -72,4 +73,5 @@ dependencies.init()
     })
     .catch((error) => {
         logger.error("[Entry] Error initializing dependencies:", error);
+        logger.errorState(error, "[Entry] - Initialization");
     });

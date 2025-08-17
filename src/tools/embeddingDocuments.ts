@@ -45,6 +45,7 @@ export class DocEmbeddingService {
       }
     } catch (error) {
       logger.error(`[DocEmbeddingService] Error loading ${filePath}:`, error);
+      logger.errorState(error, `[DocEmbeddingService] - LoadFile: ${filePath}`);
       return null;
     }
   }
@@ -97,6 +98,7 @@ export class DocEmbeddingService {
     } catch (error) {
 
       logger.error("[DocEmbeddingService] Error selecting documents to embed:", error);
+      logger.errorState(error, "[DocEmbeddingService] - GetDocumentsWithoutMetadata");
       return [];
     }
   }
@@ -117,6 +119,7 @@ export class DocEmbeddingService {
       await this.vectorStore.save(VECTOR_DATABASE_PATH);
     } catch (error) {
       logger.error("[DocEmbeddingService] Error initializing vector store:", error)
+      logger.errorState(error, "[DocEmbeddingService] - Execute");
     }
   }
 }

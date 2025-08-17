@@ -77,6 +77,7 @@ export class UseQuestionTool implements ITool<UseQuestionConsume, string> {
         } catch (err) {
             const error = err as Error;
             logger.error("[useQuestion] (useNode):", error.message);
+            logger.errorState(error.message, "[useQuestion] - UseNode");
             return { ...state, error: error.message };
         }
     }

@@ -13,12 +13,14 @@ export class FindDBService {
             const cols = columns?.length ? columns.join(", ") : "*";
             let query = `SELECT ${cols} FROM ${table}`;
             if (filters) {
-                query += ` WHERE ${filters}`;
+                query += ` ${filters}`;
             }
+
             const data = db.prepare(query).all();
             return data as Record<string, any>[];
 
-        } catch {
+        } catch (error) {
+            logger.errorState(error, "[FindDBService] - SelectFromDatabase");
             return [];
         }
     }
