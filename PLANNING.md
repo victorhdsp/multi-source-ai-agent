@@ -175,3 +175,24 @@ flowchart TD
 - Essas ferramentas são usadas durante o build e elas permitem facilitar o processo de tornar o programa agnostico a dados, ou seja, se quiser adicionar novos documentos ou novos dados no banco de dados, basta rodar essas ferramentas e elas vão atualizar os embeddings e o banco de dados automaticamente;
 
     - Por falta de tempo, o banco de dados ainda não é totalmente agnostico, ele tem a coleta de metadados (precisa de revisão porque a confiabilidade é baixa, depende de como o usuário nomeia as tabelas e colunas), mas ainda não criei a tool automaticamente, então preciso criar a tool manualmente para cada banco de dados que eu quiser usar;
+
+## Mudanças
+Acabei resolvendo implementar somente os 2 primeiros blocos, o terceiro bloco (Bloco de respostas), ele não é exatamente mais complexo, mas depende de interação humana que é demorada de fazer e gera muitos bugs, então acabei deixando para uma próxima versão.
+
+Optei por fazer um RAG com mais 'k e menos chunks', ou seja, ao invés de fazer uma busca com 5 chunks de 2000 tokens, eu faço uma busca com 20 chunks de 500 tokens, isso me permite ter mais informações relevantes e menos informações irrelevantes, mas aumenta o custo computacional e o tempo de resposta, mas como o projeto roda no computador local e não em um servidor onde o custo é alto, não vejo problema.
+
+## Proximos passos
+Perder um tempo a mais em cada uma das ferramentas, para melhorar a confiabilidade e a robustez do sistema, principalmente na parte de parsing das respostas da LLM, que é o ponto mais frágil do sistema.
+
+- Perderia um tempo a mais trabalhando ferramenta de busca, atualmente ela consegue lidar "de certa forma" com buscas complexas, mas tem um certo limite do quão eficiente ela é porque não foi feita para isso, a ferramenta esta estupidamente simples.
+
+- Tambem perderia um tempo maior construindo melhorando a ferramenta de busca SQL, para evitar multiplas consultas no banco quando precisa de uma unica busca complexa, para um deploy rápido, adicionei essa instrução no prompt e ela deve se manter, mas isso aumenta o custo computacional, custo de tempo de resposta e custo financeiro, já que cada chamada a LLM vai precisar validar se tem informações suficientes ou precisa buscar mais.
+
+- Perderia um tempo tambem lidando com o fluxo de interação humana, acho que se fosse refazer o projeto removeria o subgraph e construiria o fluxo completamente no graph principal, na minha cabeça ficaria muito complexo manter tudo junto, não estou acostumado em usar o langgraph em projetos tão grandes e achei que ficaria mais complexo que a realidade na hora do planejamento.
+
+- Acredito que os prompts podem ser melhorados, principalmente o prompt do bloco de perguntas, o selfAskWithSearch ficou bastante consistente, apesar de frequentemente retornar retornar outputs fora do padrão esperado, o que é um problema, mas acredito que seja mais por causa do modelo de linguagem do que do prompt em si.
+
+- Adicionaria mais algumas ferramentas, para auxiliar no auxilio ao usuário, como uma ferramenta para listar os arquivos do diretório atual, pegar o conteúdo de um arquivo, verificar data e hora, etc. Essas ferramentas são úteis para o dia a dia e podem ser usadas em diversas situações.
+    - Observei que seria útil, quando pedi para a LLM buscar a previsão do tempo para amanhã e ela buscou no google a previsão de amanhã e não com uma data específica, o google não conseguiu retornar a previsão mas retornou no contexto a data e o site da previsão.
+
+- Talvez falte uma amplitude maior de testes automatizados, para garantir que o sistema esteja funcionando corretamente e que as ferramentas estejam sendo usadas corretamente. Atualmente, tenho alguns testes nas partes mais críticas do sistema, mas não em todas as ferramentas e fluxos de trabalho.

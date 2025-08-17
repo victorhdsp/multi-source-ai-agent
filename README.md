@@ -77,6 +77,12 @@ flowchart LR
     ```
     > **Nota:** Ao iniciar, o agente verificará se existem novos documentos ou bancos de dados que ainda não foram processados (geração de metadados/embeddings). Ele perguntará se você deseja processá-los.
 
+    > **Nota:** Você pode fazer a geração de embeddings e metadados manualmente com o comando:
+    ```bash
+    bun run embedding
+    bun run metadata
+    ```
+
 ## Como Testar
 
 Você pode fazer perguntas que explorem as diferentes capacidades do agente.
