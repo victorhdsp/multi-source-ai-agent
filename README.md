@@ -27,7 +27,7 @@ O objetivo é criar um assistente robusto que possa ser acessado via terminal, e
 
 3.  **Roteamento Inteligente:** O agente decide qual a fonte de dados ou ferramenta mais apropriada para cada pergunta e orquestra o fluxo de trabalho para chegar à resposta final.
 
-4.  **Execução de Tarefas:** Para solicitações que exigem múltiplos passos (ex: "crie um arquivo e escreva um resumo nele"), o agente monta um plano de ação e pede permissão ao usuário antes de executá-lo.
+4.  **Planejamento de Tarefas:** Para solicitações que exigem múltiplos passos (ex: "crie um arquivo e escreva um resumo nele"), o agente monta um plano de ação detalhado e o apresenta como resposta. A funcionalidade de execução automática deste plano ainda não foi implementada.
 
 ## Arquitetura
 
@@ -37,24 +37,22 @@ O fluxo de trabalho do agente é dividido em três blocos principais, orquestrad
 flowchart LR
     question_block((Bloco de Perguntas))
     search_block((Bloco de Pesquisa))
-    response_block((Bloco de Respostas))
 
     question_block --> search_block
-    search_block --> response_block
 ```
 
 1.  **Bloco de Perguntas:** Recebe a entrada do usuário, busca informações relevantes em documentos vetorizados e decide se a solicitação é uma pergunta direta ou uma tarefa. Se a informação for suficiente, ele gera a resposta. Caso contrário, define quais informações estão faltando.
 
 2.  **Bloco de Pesquisa:** Se informações adicionais forem necessárias, este bloco é ativado. Ele utiliza um sub-agente com um conjunto de ferramentas (`SQLite`, `Curl`, `Perguntar ao Usuário`) para buscar os dados faltantes de forma iterativa.
 
-3.  **Bloco de Respostas:** Com todas as informações em mãos, este bloco formata a resposta final. Se for uma tarefa, ele apresenta o plano de execução e solicita a aprovação do usuário antes de agir.
+3.  **Bloco de Respostas:** Com todas as informações em mãos, este bloco formata a resposta final. Se a solicitação for uma tarefa, a resposta será o plano de ação construído.
 
 ## Como Executar
 
 1.  **Clone o repositório:**
     ```bash
-    git clone <url-do-repositorio>
-    cd skip
+    git clone https://github.com/victorhdsp/multi-source-ai-agent
+    cd multi-source-ai-agent
     ```
 
 2.  **Instale as dependências:**
@@ -85,25 +83,22 @@ Você pode fazer perguntas que explorem as diferentes capacidades do agente.
 
 1.  **Consulta ao Banco de Dados (usando `music.db`):**
     -   `"Quais os álbuns do artista 'Accept'?"`
-    -   `"Liste os nomes dos funcionários que moram em Calgary."`
+    -   `"Liste os nomes dos clientes que moram no Brazil."`
 
 2.  **Consulta a Documentos (usando `economy_books.txt`):**
-    -   `"Faça um resumo sobre o livro de economia."`
-    -   `"Quais os principais tópicos abordados no documento sobre economia?"`
+    -   `"Quais foram os livros de economia mais influentes da história?"`
+    -   `"O que John Maynard Keynes pensava sobre economia?"`
 
 3.  **Comando Externo (Curl):**
-    -   `"Qual a capital da França?"`
-    -   `"Qual a previsão do tempo para São Paulo amanhã?"`
+    -   `"Onde fica localizado o Brasil?"`
+    -   `"Quando morreu Charles Darwin?"`
 
-4.  **Execução de Tarefa:**
+4.  **Planejamento de Tarefa:**
     -   `"Crie um arquivo chamado 'artistas.txt' e liste todos os nomes de artistas do banco de dados nele."`
+    > O agente irá gerar um plano detalhado de como essa tarefa deve ser executada.
 
 ## Recursos
 
 -   [LangChain JS Documentation](https://js.langchain.com/docs/)
 -   [LangGraph Documentation](https://js.langchain.com/docs/langgraph/)
 -   [Google AI for Developers](https://ai.google.dev/)
-
-## Licença
-
-Este projeto está licenciado sob a Licença MIT - veja o arquivo [LICENSE](LICENSE) para mais detalhes.

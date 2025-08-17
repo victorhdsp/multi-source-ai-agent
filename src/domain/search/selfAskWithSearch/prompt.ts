@@ -16,7 +16,7 @@ export const agentSearchPrompt: BaseMessagePromptTemplateLike[] = [
     { role: "user", content: "Esse é um schema feito no Zod que representa o formato da resposta, ela sempre deve seguir esse schema: {format_instructions}, todos os campos são obrigatórios, dentro do schema tem `type` que não deve ser modficado, `step` é usado para que o cliente tenha noção do passo atual, porém eles tem valores específicos que são: {steps}, caso você consiga responder a pergunta utilize o step de WHATNOT e caso esteja resolvido mesmo que ainda tenha perguntas use o step de STOP." },
     { role: "user", content: "O problema do usuário é: {problem}" },
     { role: "user", content: "As informações faltantes são: {missing}" },
-    { role: "user", content: "As fontes que você já buscou são: {searched_sources}" }
+    { role: "user", content: "As fontes que você já buscou são: {searched_sources}, no caso de você já ter buscado uma fonte não deve buscá-la novamente." }
 ]
 
 export function useTools(toolBox: DynamicStructuredTool[]): BaseMessagePromptTemplateLike[] {

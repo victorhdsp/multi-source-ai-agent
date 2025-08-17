@@ -21,7 +21,7 @@ export class FindDBService {
 
         } catch (error) {
             logger.errorState(error, "[FindDBService] - SelectFromDatabase");
-            return [];
+            return [`Nenhum dado encontrado com ${path}, ${table}, ${filters}, ${columns}`];
         }
     }
 }

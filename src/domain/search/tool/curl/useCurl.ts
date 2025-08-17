@@ -29,7 +29,13 @@ export class UseCurlTool implements ITool<UseCurlConsume, UseCurlTraitment> {
     async getDoc(): Promise<IDocumentTool> {
         return {
             name: SEARCH_AGENT_STEPS.USE_CURL,
-            description: "A ferramenta para fazer requisições HTTP utilizando curl",
+            description: (
+                "A ferramenta para fazer requisições HTTP utilizando curl" +
+                "Você pode usar essa ferramenta para acessar páginas da web e extrair informações relevantes." +
+                "Regras:" +
+                "   - Caso o usuário forneça uma URL, você deve fazer a requisição para essa URL e retornar o conteúdo da página." +
+                "   - Se a URL não for fornecida, você pode fazer uma busca genérica na web, utilizando sites de busca para coletar a informação através de (https://www.google.com/search?q=<conteudo>), (https://www.bing.com/search?q=<conteudo>) ou na (https://pt.wikipedia.org/wiki/<nome>)."
+            ),
             schema: useCurlConsume
         };
     }

@@ -25,7 +25,7 @@ export class QuestionAgentUsecase {
 
     private async execute(input: string): Promise<QuestionAgentDTO> {
         const context = await secureExecAsync(async () => {
-            const similarData = await this.vectorStore.similaritySearch(input, 3);
+            const similarData = await this.vectorStore.similaritySearch(input, 20);
             return similarData.map(data => data.pageContent).join('\n');
         }, ERROR_MESSAGE.FAIL_IN_RAG);
 

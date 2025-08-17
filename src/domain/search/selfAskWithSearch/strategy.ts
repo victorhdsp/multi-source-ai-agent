@@ -84,7 +84,7 @@ export class SelfAskWithSearchStrategy {
         }
 
         if (state.llMOutput.step === SEARCH_AGENT_STEPS.WHATNOT) {
-            logger.thinking("Não consegui responder a pergunta.");
+            logger.thinking("Não tenho certeza da resposta.");
             return SEARCH_AGENT_STEPS.WHATNOT;
         }
         

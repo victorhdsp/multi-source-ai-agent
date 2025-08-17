@@ -58,10 +58,11 @@ export class UseSQLiteTool implements ITool<UseSQLiteConsume, UseSqliteTraitment
                 "Descrição dos bancos de dados:\n" +
                 databaseMap + "\n\n" +
                 "Regras:" +
-                "- Você precisa escolher o banco de dados, enviar o `path`, a `table`, os `filters` e as `columns` que precisa para receber os dados." +
-                "- Sempre que possível, utilize filtros para limitar a quantidade de dados retornados." +
-                "- Se não tiver certeza sobre o nome do banco de dados, tabela ou colunas, consulte a descrição do banco de dados." +
-                "- Sempre retorne os dados no formato especificado."
+                "   - Você precisa escolher o banco de dados, enviar o `path`, a `table`, os `filters` e as `columns` que precisa para receber os dados." +
+                "   - Sempre que possível, utilize `filters` para limitar a quantidade de dados retornados, mas deixe explícito qual filter você está usando (ex: `WHERE id = 1`, `LIMIT 10`, `OFFSET 0`), porque `Name = 'Accept'` daria erro em SQL o correto seria `WHERE Name = 'Accept'`." +
+                "   - Se não tiver certeza sobre o nome do banco de dados, tabela ou colunas, consulte a descrição do banco de dados." +
+                "   - Sempre retorne os dados no formato especificado." + 
+                "   - Não tente fazer consultas complexas, apenas seleções simples, se precisar de dados de multiplas tabelas, consulto o banco de dados multiplas vezes."
             ),
             schema: useSQLiteConsume
         }
