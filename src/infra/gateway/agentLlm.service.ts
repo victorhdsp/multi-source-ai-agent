@@ -1,4 +1,4 @@
-import { ERROR_TYPE } from "@/src/config";
+import { ERROR_TYPE, GOOGLE_API_KEY, PRIMARY_MODEL, SECONDARY_MODEL } from "@/src/config";
 import { logger } from "@/src/tools/logger";
 import type { CallbackManagerForLLMRun } from "@langchain/core/callbacks/manager";
 import { BaseChatModel } from "@langchain/core/language_models/chat_models";
@@ -15,12 +15,14 @@ export class AgentLLMService extends BaseChatModel {
         super(baseParams);
 
         this.primaryLLM = new ChatGoogleGenerativeAI({
-            model: "gemini-2.5-flash",
+            model: PRIMARY_MODEL,
+            apiKey: GOOGLE_API_KEY,
             temperature: 0
         });
 
         this.secondaryLLM = new ChatGoogleGenerativeAI({
-            model: "gemini-2.0-flash",
+            model: SECONDARY_MODEL,
+            apiKey: GOOGLE_API_KEY,
             temperature: 0
         });
     }

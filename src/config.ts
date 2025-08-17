@@ -1,7 +1,37 @@
 import path from 'path';
+import fs from 'fs';
 
+export const SYSTEM_DATA = {
+    name: "multi-agent",
+    version: "0.1.0",
+    currentSeason: null as string | null,
+}
+
+export const EMBEDDING_MODEL =process.env.EMBEDDING_MODEL || "text-embedding-004";
+export const PRIMARY_MODEL = process.env.PRIMARY_MODEL || "gemini-2.0-flash-lite";
+export const SECONDARY_MODEL = process.env.SECONDARY_MODEL || "gemini-2.5-flash";
+export const GOOGLE_API_KEY = process.env.GOOGLE_API_KEY;
+
+const resolvePath = (relativePath: string) => {
+    try {
+        fs.readdirSync(relativePath);
+    } catch {
+        fs.mkdirSync(relativePath, { recursive: true });
+    }
+}
+
+export const DOCUMENT_TO_EMBED_PATH = path.join(__dirname, '../data/documents/');
+resolvePath(DOCUMENT_TO_EMBED_PATH);
+export const DOCUMENT_METADATA_PATH = path.join(__dirname, 'infra/database/documents');
+resolvePath(DOCUMENT_METADATA_PATH);
 export const SQL_DATABASE_PATH = path.join(__dirname, '../data/sqlite');
+resolvePath(SQL_DATABASE_PATH);
+export const SQL_METADATA_PATH = path.join(__dirname, 'infra/database/sqlite');
+resolvePath(SQL_METADATA_PATH);
 export const VECTOR_DATABASE_PATH = path.join(__dirname, 'infra/database/vector');
+resolvePath(VECTOR_DATABASE_PATH);
+export const LOG_PATH = path.join(__dirname, '../logs');
+resolvePath(LOG_PATH);
 
 export const ERROR_TYPE = {
     PARSER: "ParserError",
@@ -18,13 +48,7 @@ export const ERROR_MESSAGE = {
         return `Entrada inválida. As opções válidas são: ${validInputs.join(', ')}.`;
     },
     FAIL_TO_PARSE: "Falha ao analisar a saída do modelo.",
-}
-
-export const HUMAN_REQUEST = {
-    PERMISSION: "getPermission"
-}
-
-export const HUMAN_RESPONSE = {
-    TRUE: new Set(["sim", "s", "yes", "y"]),
-    FALSE: new Set(["não", "n", "no"]),
+    NOT_SUPPORT_BIND_TOOLS: "Este modelo não suporta vinculação de ferramentas via bindTools, utilizando métodos manuais.",
+    NO_ACCESS_TO_PAGE: (url: string) => `Não consegui acessar a página ${url}.`,
+    NO_ACCESS_TO_DB: (table: string, database:string) => `Não consegui acessar a tabela ${table} do banco de dados ${database}.`,
 }

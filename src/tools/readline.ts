@@ -5,7 +5,7 @@ import { logger } from "./logger";
 export const rlBus = new EventEmitter();
 
 let rl: readline.Interface | null = null;
-const PROMPT = "User= ";
+const PROMPT = "\nUser= ";
 
 export function startReadline() {
   if (rl) return rl;
@@ -48,7 +48,7 @@ export function rlWrite(line: string) {
 }
 
 export function waitForUserInput(promptMessage: string): Promise<string> {
-  logger.talk(promptMessage);
+  logger.talk(`\n${promptMessage}`);
   rlPrompt();
 
   return new Promise((resolve) => {

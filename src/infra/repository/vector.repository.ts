@@ -1,5 +1,5 @@
 import { HNSWLib } from "@langchain/community/vectorstores/hnswlib";
-import type { IVectorStore, VectorDocument, VectorSearchResult } from "../interfaces/vector.repository";
+import type { IVectorStore, VectorDocument, VectorSearchResult } from "@/src/infra/interfaces/vector.repository";
 import type { Embeddings } from "@langchain/core/embeddings";
 import { promises as fs } from "fs";
 import type { SpaceName } from "hnswlib-node";
@@ -60,8 +60,6 @@ export class VectorStore implements IVectorStore {
                 space: this.SPACE,
                 numDimensions: this.NUM_DIMENSIONS
             });
-
-            await this.save(path);
         }
     }
 
